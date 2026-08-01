@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { prisma } from "@/lib/db";
+import { isInviteUsable } from "@/lib/invites";
 import { SignUpForm } from "./sign-up-form";
 
 export const metadata: Metadata = { title: "Crear cuenta" };
@@ -21,8 +22,7 @@ export default async function SignUpPage({
       })
     : null;
 
-  const invalidInvite =
-    !!code && (!invitation || !!invitation.usedAt || invitation.expiresAt < new Date());
+  const invalidInvite = !!code && (!invitation || !isInviteUsable(invitation));
 
   return (
     <div className="card p-6">

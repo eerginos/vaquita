@@ -16,8 +16,12 @@ import {
 } from "@/lib/auth";
 import { colorForSeed } from "@/lib/colors";
 import { emojiForSeed, isValidUserEmoji } from "@/lib/emojis";
+import { isInviteUsable } from "@/lib/invites";
 
 export type ActionState = { error?: string; success?: string };
+
+/** Se lanza adentro de la transacción cuando otro consumió el último uso del link. */
+class InviteRaceError extends Error {}
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -71,7 +75,7 @@ export async function signUpAction(
   if (!isBootstrap) {
     if (!code) return { error: "Necesitás un link de invitación para crear una cuenta." };
     invitation = await prisma.invitation.findUnique({ where: { code } });
-    if (!invitation || invitation.usedAt || invitation.expiresAt < new Date()) {
+    if (!invitation || !isInviteUsable(invitation)) {
       return { error: "Esa invitación no existe, ya se usó o venció." };
     }
   }
@@ -81,7 +85,9 @@ export async function signUpAction(
 
   const passwordHash = await hashPassword(password);
 
-  const user = await prisma.$transaction(async (tx) => {
+  let user;
+  try {
+    user = await prisma.$transaction(async (tx) => {
     const created = await tx.user.create({
       data: {
         name,
@@ -96,10 +102,16 @@ export async function signUpAction(
     });
 
     if (invitation) {
-      await tx.invitation.update({
-        where: { id: invitation.id },
-        data: { usedAt: new Date(), usedById: created.id },
+      // Compare-and-swap sobre useCount: si dos personas abren el mismo link
+      // al mismo tiempo, sólo una consume el uso y la otra reintenta.
+      const claimed = await tx.invitation.updateMany({
+        where: { id: invitation.id, useCount: invitation.useCount },
+        data: {
+          useCount: invitation.useCount + 1,
+          ...(invitation.usedAt ? {} : { usedAt: new Date(), usedById: created.id }),
+        },
       });
+      if (claimed.count === 0) throw new InviteRaceError();
 
       if (invitation.groupId) {
         await tx.groupMember.create({
@@ -116,8 +128,14 @@ export async function signUpAction(
       }
     }
 
-    return created;
-  });
+      return created;
+    });
+  } catch (error) {
+    if (error instanceof InviteRaceError) {
+      return { error: "Alguien usó esa invitación justo antes. Pedí un link nuevo." };
+    }
+    throw error;
+  }
 
   const ua = (await headers()).get("user-agent") ?? undefined;
   await createSession(user.id, ua);

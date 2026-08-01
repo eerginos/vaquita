@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/db";
 import { hashPassword, hashResetToken, newToken, requireAdmin, requireUser } from "@/lib/auth";
+import { inviteLifetimeDays, inviteUrl } from "@/lib/invites";
 
 export type AdminState = { error?: string; success?: string; link?: string };
 
@@ -18,17 +19,26 @@ export async function createGlobalInviteAction(
   const user = await requireAdmin();
   const label = String(formData.get("label") ?? "").trim() || null;
 
+  const multiUse = formData.get("multiUse") === "on";
+  const days = inviteLifetimeDays(multiUse);
+
   const invite = await prisma.invitation.create({
     data: {
       code: newToken(),
       label,
       createdById: user.id,
-      expiresAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+      maxUses: multiUse ? null : 1,
+      expiresAt: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
     },
   });
 
   revalidatePath("/admin");
-  return { success: "Invitación creada.", link: `${appUrl()}/registro?code=${invite.code}` };
+  return {
+    success: multiUse
+      ? `Link para varios, vence en ${days} días.`
+      : `Link de un solo uso, vence en ${days} días.`,
+    link: inviteUrl(appUrl(), invite.code),
+  };
 }
 
 export async function createPasswordResetAction(

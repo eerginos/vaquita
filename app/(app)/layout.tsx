@@ -3,6 +3,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { Avatar } from "@/components/avatar";
 import { BottomNav, SidebarNav } from "@/components/nav";
+import { Logo } from "@/components/logo";
 import { signOutAction } from "@/app/actions/auth";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -13,9 +14,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <header className="sticky top-0 z-30 border-b bg-[var(--surface)]/90 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4">
           <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-base">
-              🧾
-            </span>
+<Logo size={32} className="rounded-lg" />
             Split
           </Link>
 

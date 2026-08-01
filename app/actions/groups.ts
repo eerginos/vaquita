@@ -8,6 +8,7 @@ import { newToken, requireUser } from "@/lib/auth";
 import { settlementPlan } from "@/lib/balances";
 import { loadLedgers } from "@/lib/queries";
 import { CURRENCIES } from "@/lib/money";
+import { inviteLifetimeDays, isInviteUsable } from "@/lib/invites";
 import { GROUP_EMOJIS } from "@/lib/categories";
 
 export type ActionState = { error?: string; success?: string };
@@ -237,13 +238,18 @@ export async function createGroupInviteAction(formData: FormData): Promise<void>
   const groupId = String(formData.get("groupId") ?? "");
   await assertMember(groupId, user.id);
 
+  // Un link "para varios" es el que se manda a un grupo de WhatsApp.
+  const multiUse = formData.get("multiUse") === "on";
+  const days = inviteLifetimeDays(multiUse);
+
   await prisma.invitation.create({
     data: {
       code: newToken(),
       groupId,
       createdById: user.id,
       label: String(formData.get("label") ?? "").trim() || null,
-      expiresAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+      maxUses: multiUse ? null : 1,
+      expiresAt: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
     },
   });
 

@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/auth";
 import { revokeInviteAction } from "@/app/actions/groups";
 import { toggleAdminAction } from "@/app/actions/admin";
 import { formatDate, formatRelative } from "@/lib/dates";
+import { inviteUrl, isInviteUsable, usesLabel } from "@/lib/invites";
 import { Avatar } from "@/components/avatar";
 import { SubmitButton } from "@/components/submit-button";
 import { CopyField } from "@/components/copy-field";
@@ -16,7 +17,7 @@ export const metadata: Metadata = { title: "Administración" };
 export default async function AdminPage() {
   const me = await requireAdmin();
 
-  const [users, invites] = await Promise.all([
+  const [users, allInvites] = await Promise.all([
     prisma.user.findMany({
       orderBy: { createdAt: "asc" },
       select: {
@@ -31,7 +32,8 @@ export default async function AdminPage() {
       },
     }),
     prisma.invitation.findMany({
-      where: { usedAt: null, expiresAt: { gt: new Date() } },
+      // Se filtran por usos restantes en memoria: Prisma no compara dos columnas.
+      where: { expiresAt: { gt: new Date() } },
       orderBy: { createdAt: "desc" },
       include: {
         createdBy: { select: { name: true } },
@@ -41,6 +43,7 @@ export default async function AdminPage() {
   ]);
 
   const appUrl = (process.env.APP_URL ?? "").replace(/\/$/, "");
+  const invites = allInvites.filter((i) => isInviteUsable(i));
 
   return (
     <div className="space-y-6">
@@ -68,12 +71,12 @@ export default async function AdminPage() {
           <ul className="divide-y">
             {invites.map((invite) => (
               <li key={invite.id} className="space-y-2 px-5 py-3">
-                <CopyField value={`${appUrl}/registro?code=${invite.code}`} />
+                <CopyField value={inviteUrl(appUrl, invite.code)} />
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="hint">
                     {invite.label && <strong>{invite.label} · </strong>}
                     {invite.group ? `${invite.group.emoji} ${invite.group.name} · ` : "sin grupo · "}
-                    creada por {invite.createdBy.name} · vence el {formatDate(invite.expiresAt)}
+                    {usesLabel(invite)} · vence el {formatDate(invite.expiresAt)}
                   </p>
                   <form action={revokeInviteAction}>
                     <input type="hidden" name="inviteId" value={invite.id} />

@@ -13,6 +13,7 @@ import {
   toggleArchiveGroupAction,
 } from "@/app/actions/groups";
 import { formatDate } from "@/lib/dates";
+import { inviteUrl, isInviteUsable, usesLabel } from "@/lib/invites";
 import { Avatar } from "@/components/avatar";
 import { Balance } from "@/components/money";
 import { SubmitButton } from "@/components/submit-button";
@@ -36,14 +37,15 @@ export default async function GroupSettingsPage({
   const isOwner = group.members.find((m) => m.id === user.id)?.role === "OWNER";
   const memberIds = group.members.map((m) => m.id);
 
-  const [candidates, invites, hasMovements] = await Promise.all([
+  const [candidates, allInvites, hasMovements] = await Promise.all([
     prisma.user.findMany({
       where: { id: { notIn: memberIds } },
       orderBy: { name: "asc" },
       select: { id: true, name: true, email: true, color: true, emoji: true },
     }),
     prisma.invitation.findMany({
-      where: { groupId, usedAt: null, expiresAt: { gt: new Date() } },
+      // Los usos restantes se filtran abajo: Prisma no compara dos columnas.
+      where: { groupId, expiresAt: { gt: new Date() } },
       orderBy: { createdAt: "desc" },
       include: { createdBy: { select: { name: true } } },
     }),
@@ -51,6 +53,7 @@ export default async function GroupSettingsPage({
   ]);
 
   const appUrl = process.env.APP_URL ?? "";
+  const invites = allInvites.filter((i) => isInviteUsable(i));
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -145,7 +148,8 @@ export default async function GroupSettingsPage({
           <h2 className="text-sm font-semibold">Invitar gente nueva</h2>
           <p className="hint mt-0.5">
             Generá un link y mandáselo por WhatsApp. Quien lo abra crea su cuenta y entra directo a
-            este grupo. Vence a los 14 días y se usa una sola vez.
+            este grupo; si ya tiene cuenta, le ofrece sumarse. Por defecto sirve para una sola
+            persona.
           </p>
         </div>
 
@@ -153,10 +157,11 @@ export default async function GroupSettingsPage({
           <ul className="divide-y">
             {invites.map((invite) => (
               <li key={invite.id} className="space-y-2 px-5 py-3">
-                <CopyField value={`${appUrl}/registro?code=${invite.code}`} />
+                <CopyField value={inviteUrl(appUrl, invite.code)} />
                 <div className="flex items-center justify-between">
                   <p className="hint">
-                    Creado por {invite.createdBy.name} · vence el {formatDate(invite.expiresAt)}
+                    {invite.label ? `${invite.label} · ` : ""}
+                    {usesLabel(invite)} · vence el {formatDate(invite.expiresAt)}
                   </p>
                   <form action={revokeInviteAction}>
                     <input type="hidden" name="inviteId" value={invite.id} />
@@ -171,17 +176,33 @@ export default async function GroupSettingsPage({
         )}
 
         <div className="border-t p-5">
-          <form action={createGroupInviteAction} className="flex gap-2">
+          <form action={createGroupInviteAction} className="space-y-3">
             <input type="hidden" name="groupId" value={groupId} />
-            <input
-              name="label"
-              className="input"
-              placeholder="Para quién es (opcional)"
-              maxLength={60}
-            />
-            <SubmitButton className="btn-secondary shrink-0 text-sm" pendingLabel="Generando…">
-              Generar link
-            </SubmitButton>
+            <div className="flex gap-2">
+              <input
+                name="label"
+                className="input"
+                placeholder="Para quién es (opcional)"
+                maxLength={60}
+              />
+              <SubmitButton className="btn-secondary shrink-0 text-sm" pendingLabel="Generando…">
+                Generar link
+              </SubmitButton>
+            </div>
+            <label className="flex cursor-pointer items-start gap-2.5 rounded-lg border p-3">
+              <input
+                type="checkbox"
+                name="multiUse"
+                className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--color-brand-600)]"
+              />
+              <span>
+                <span className="block text-sm font-medium">Que lo pueda usar más de uno</span>
+                <span className="hint">
+                  Para mandar al grupo de WhatsApp. Lo usa quien quiera hasta que venza, a los 7
+                  días en vez de 14. Podés revocarlo en cualquier momento.
+                </span>
+              </span>
+            </label>
           </form>
         </div>
       </section>

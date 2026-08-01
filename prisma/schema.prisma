@@ -69,6 +69,11 @@ model Invitation {
   groupId     String?
   createdById String
   expiresAt   DateTime
+  /// Cuántas veces se puede usar. null = las que sea, hasta que venza.
+  /// Un link para mandar a un grupo de WhatsApp va con null.
+  maxUses     Int?      @default(1)
+  useCount    Int       @default(0)
+  /// La primera vez que se usó y quién, a título informativo.
   usedAt      DateTime?
   usedById    String?
   createdAt   DateTime  @default(now())

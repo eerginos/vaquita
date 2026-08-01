@@ -361,8 +361,14 @@ function SettlementRow({
   settlement: SettlementItem;
   shortOf: (id: string) => string;
 }) {
-  const from = settlement.fromUserId === userId ? "Vos" : shortOf(settlement.fromUserId);
-  const to = settlement.toUserId === userId ? "vos" : shortOf(settlement.toUserId);
+  // "Vos le pagó a Sofía" no se puede leer: cuando participa quien mira,
+  // la frase va conjugada en segunda persona.
+  const label =
+    settlement.fromUserId === userId
+      ? `Le pagaste a ${shortOf(settlement.toUserId)}`
+      : settlement.toUserId === userId
+        ? `${shortOf(settlement.fromUserId)} te pagó`
+        : `${shortOf(settlement.fromUserId)} le pagó a ${shortOf(settlement.toUserId)}`;
 
   return (
     <li className="flex items-center gap-3 bg-brand-500/[0.04] px-4 py-3">
@@ -370,9 +376,7 @@ function SettlementRow({
         💸
       </span>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">
-          {from} le pagó a {to}
-        </p>
+        <p className="truncate text-sm font-medium">{label}</p>
         <p className="truncate text-xs text-[var(--text-muted)]">
           {formatDate(settlement.date)}
           {settlement.note && ` · ${settlement.note}`}
