@@ -7,6 +7,7 @@ import { getGroupDetail, getGroupTimeline, getGroupTotals } from "@/lib/queries"
 import { formatDate, formatMonthYear, monthKey } from "@/lib/dates";
 import { getCategory } from "@/lib/categories";
 import { formatMoney, formatMoneyAbs } from "@/lib/money";
+import { shortNames } from "@/lib/names";
 import { quickSettleAction } from "@/app/actions/settlements";
 import { Avatar, AvatarStack } from "@/components/avatar";
 import { Balance } from "@/components/money";
@@ -34,7 +35,11 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
   ]);
   const myBalance = group.net.get(user.id) ?? 0n;
   const myCosts = totals.costsByUser.get(user.id) ?? 0n;
-  const nameOf = (id: string) => group.members.find((m) => m.id === id)?.name ?? "alguien";
+
+  // En las listas apretadas va el nombre de pila; el completo queda para
+  // integrantes, perfil y el detalle del gasto.
+  const short = shortNames(group.members);
+  const shortOf = (id: string) => short.get(id) ?? "alguien";
 
   // Agrupo la lista por mes para que se lea como un extracto.
   const months = new Map<string, typeof timeline>();
@@ -159,11 +164,11 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
               return (
                 <li key={i} className="space-y-2 px-5 py-3">
                   <div className="flex flex-wrap items-center gap-2 text-sm">
-                    <Avatar name={nameOf(t.fromUserId)} color={from?.color} emoji={from?.emoji} size="xs" />
-                    <span className="font-medium">{iPay ? "Vos" : nameOf(t.fromUserId)}</span>
+                    <Avatar name={from?.name ?? "?"} color={from?.color} emoji={from?.emoji} size="xs" />
+                    <span className="font-medium">{iPay ? "Vos" : shortOf(t.fromUserId)}</span>
                     <span className="text-[var(--text-muted)]">le debe a</span>
-                    <Avatar name={nameOf(t.toUserId)} color={to?.color} emoji={to?.emoji} size="xs" />
-                    <span className="font-medium">{iCollect ? "vos" : nameOf(t.toUserId)}</span>
+                    <Avatar name={to?.name ?? "?"} color={to?.color} emoji={to?.emoji} size="xs" />
+                    <span className="font-medium">{iCollect ? "vos" : shortOf(t.toUserId)}</span>
                     <span className="ml-auto font-semibold tabular-nums">
                       {formatMoney(t.amountCents, group.currency)}
                     </span>
@@ -251,6 +256,7 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
                         userId={user.id}
                         currency={group.currency}
                         expense={item.data}
+                        shortOf={shortOf}
                       />
                     ) : (
                       <SettlementRow
@@ -258,6 +264,7 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
                         userId={user.id}
                         currency={group.currency}
                         settlement={item.data}
+                        shortOf={shortOf}
                       />
                     ),
                   )}
@@ -280,11 +287,13 @@ function ExpenseRow({
   userId,
   currency,
   expense,
+  shortOf,
 }: {
   groupId: string;
   userId: string;
   currency: string;
   expense: ExpenseItem;
+  shortOf: (id: string) => string;
 }) {
   const category = getCategory(expense.category);
   const paid = expense.payers.find((p) => p.userId === userId)?.amountCents ?? 0n;
@@ -295,7 +304,7 @@ function ExpenseRow({
     expense.payers.length === 1
       ? expense.payers[0].userId === userId
         ? "Pagaste vos"
-        : `Pagó ${expense.payers[0].user.name}`
+        : `Pagó ${shortOf(expense.payers[0].userId)}`
       : `Pagaron ${expense.payers.length} personas`;
 
   return (
@@ -345,13 +354,15 @@ function SettlementRow({
   userId,
   currency,
   settlement,
+  shortOf,
 }: {
   userId: string;
   currency: string;
   settlement: SettlementItem;
+  shortOf: (id: string) => string;
 }) {
-  const from = settlement.fromUserId === userId ? "Vos" : settlement.from.name;
-  const to = settlement.toUserId === userId ? "vos" : settlement.to.name;
+  const from = settlement.fromUserId === userId ? "Vos" : shortOf(settlement.fromUserId);
+  const to = settlement.toUserId === userId ? "vos" : shortOf(settlement.toUserId);
 
   return (
     <li className="flex items-center gap-3 bg-brand-500/[0.04] px-4 py-3">

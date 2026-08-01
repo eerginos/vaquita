@@ -8,6 +8,7 @@ import type { ActionState } from "@/app/actions/expenses";
 import { CATEGORIES } from "@/lib/categories";
 import { centsToInput, formatMoney, parseAmountToCents, splitEvenly, sum } from "@/lib/money";
 import { computePayers, computeShares, SPLIT_TYPES, type SplitType } from "@/lib/split";
+import { shortNames } from "@/lib/names";
 import { Avatar } from "@/components/avatar";
 import { FormError } from "@/components/form-error";
 import { MoneyInput } from "@/components/money-input";
@@ -166,6 +167,9 @@ export function ExpenseForm({
     );
   };
 
+  const short = shortNames(members);
+  const shortOf = (id: string) => short.get(id) ?? "alguien";
+
   const orderedParticipants = members.filter((m) => participants.includes(m.id));
   const shareAmountOf = (userId: string) => {
     if (!preview.ok) return null;
@@ -286,7 +290,7 @@ export function ExpenseForm({
               {members.map((m) => (
                 <li key={m.id} className="flex items-center gap-3">
                   <Avatar name={m.name} color={m.color} emoji={m.emoji} size="sm" />
-                  <span className="min-w-0 flex-1 truncate text-sm">{m.name}</span>
+                  <span className="min-w-0 flex-1 truncate text-sm">{shortOf(m.id)}</span>
                   <MoneyInput
                     name={`payer:${m.id}`}
                     value={payerAmounts[m.id] ?? ""}
@@ -363,7 +367,7 @@ export function ExpenseForm({
                       !included && "text-[var(--text-soft)] line-through",
                     )}
                   >
-                    {m.name}
+                    {shortOf(m.id)}
                   </span>
                   {/* En mobile el importe va debajo del nombre; en desktop tiene columna propia. */}
                   <span className="block text-xs tabular-nums text-[var(--text-muted)] sm:hidden">

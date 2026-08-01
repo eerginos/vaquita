@@ -110,15 +110,6 @@ export async function requireAdmin(): Promise<CurrentUser> {
   return user;
 }
 
-/** Verifica que el usuario sea miembro del grupo. Devuelve el rol. */
-export async function requireMembership(userId: string, groupId: string) {
-  const membership = await prisma.groupMember.findUnique({
-    where: { groupId_userId: { groupId, userId } },
-  });
-  if (!membership) redirect("/");
-  return membership;
-}
-
 export function hashResetToken(token: string): string {
   return hashToken(token);
 }
