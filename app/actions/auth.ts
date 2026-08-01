@@ -55,6 +55,8 @@ export async function signUpAction(
   const password = String(formData.get("password") ?? "");
   const password2 = String(formData.get("password2") ?? "");
   const code = text(formData, "code");
+  const emoji = text(formData, "emoji");
+  const payAlias = text(formData, "payAlias").slice(0, 120) || null;
 
   if (name.length < 2) return { error: "Poné tu nombre (mínimo 2 caracteres)." };
   if (!EMAIL_RE.test(email)) return { error: "Ese email no parece válido." };
@@ -86,7 +88,9 @@ export async function signUpAction(
         email,
         passwordHash,
         color: colorForSeed(email),
-        emoji: emojiForSeed(email),
+        // Si no eligió ninguno en el registro, le toca uno estable por email.
+        emoji: isValidUserEmoji(emoji) ? emoji : emojiForSeed(email),
+        payAlias,
         isAdmin: isBootstrap,
       },
     });

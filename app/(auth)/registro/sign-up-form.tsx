@@ -1,8 +1,11 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
+import clsx from "clsx";
 
 import { signUpAction, type ActionState } from "@/app/actions/auth";
+import { emojiForSeed, USER_EMOJIS } from "@/lib/emojis";
+import { Avatar } from "@/components/avatar";
 import { FormError } from "@/components/form-error";
 import { SubmitButton } from "@/components/submit-button";
 
@@ -10,25 +13,60 @@ const initial: ActionState = {};
 
 export function SignUpForm({ code }: { code: string }) {
   const [state, action] = useActionState(signUpAction, initial);
+  const [name, setName] = useState("");
+  const [emoji, setEmoji] = useState("");
+
+  // Hasta que elija uno, se muestra el que le tocaría por defecto.
+  const shownEmoji = emoji || emojiForSeed(name || "split");
 
   return (
     <form action={action} className="space-y-4">
       <input type="hidden" name="code" value={code} />
+      <input type="hidden" name="emoji" value={shownEmoji} />
       <FormError message={state.error} />
 
       <div>
         <label className="label" htmlFor="name">
           Nombre
         </label>
-        <input
-          id="name"
-          name="name"
-          required
-          autoFocus
-          autoComplete="name"
-          className="input"
-          placeholder="Emiliano"
-        />
+        <div className="flex gap-2">
+          <Avatar name={name || "?"} emoji={shownEmoji} size="md" className="shrink-0" />
+          <input
+            id="name"
+            name="name"
+            required
+            autoFocus
+            autoComplete="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="input"
+            placeholder="Emiliano Erginos"
+          />
+        </div>
+        <p className="hint mt-1">Como te van a ver los demás. Podés poner nombre y apellido.</p>
+      </div>
+
+      <div>
+        <span className="label">Elegí tu emoji</span>
+        <div className="grid max-h-32 grid-cols-8 gap-1 overflow-y-auto rounded-lg border p-1.5">
+          {USER_EMOJIS.map((option) => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => setEmoji(option)}
+              className={clsx(
+                "flex h-8 items-center justify-center rounded-md border text-base transition",
+                shownEmoji === option
+                  ? "border-brand-500 bg-brand-500/10"
+                  : "border-transparent hover:bg-[var(--surface-2)]",
+              )}
+              aria-label={`Elegir ${option}`}
+              aria-pressed={shownEmoji === option}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div>
@@ -75,6 +113,23 @@ export function SignUpForm({ code }: { code: string }) {
           autoComplete="new-password"
           className="input"
         />
+      </div>
+
+      <div>
+        <label className="label" htmlFor="payAlias">
+          Dónde te transfieren{" "}
+          <span className="font-normal text-[var(--text-muted)]">(opcional)</span>
+        </label>
+        <input
+          id="payAlias"
+          name="payAlias"
+          maxLength={120}
+          className="input"
+          placeholder="tu.alias.mp, CBU, o link de Mercado Pago"
+        />
+        <p className="hint mt-1">
+          Se lo mostramos sólo a quien te tenga que pagar. Lo podés cargar después desde tu perfil.
+        </p>
       </div>
 
       <SubmitButton className="btn-primary w-full" pendingLabel="Creando…">
