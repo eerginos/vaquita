@@ -319,7 +319,7 @@ export function IncludeForm({
             <SubmitButton
               className={clsx("btn-primary flex-1", selectedIds.length === 0 && "pointer-events-none opacity-50")}
               pendingLabel="Recalculando…"
-              confirm={`Se van a recalcular ${selectedIds.length} gasto(s). Los saldos del grupo cambian para todos. ¿Seguimos?`}
+              confirm="Cambian los saldos de todos. ¿Seguimos?"
             >
               Recalcular {selectedIds.length} gasto{selectedIds.length === 1 ? "" : "s"}
             </SubmitButton>

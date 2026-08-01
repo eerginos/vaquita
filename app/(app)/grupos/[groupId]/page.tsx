@@ -183,11 +183,7 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
                       <SubmitButton
                         className="btn-secondary px-2.5 py-1 text-xs"
                         pendingLabel="Registrando…"
-                        confirm={
-                          iPay
-                            ? `¿Registrar que le pagaste ${formatMoney(t.amountCents, group.currency)} a ${nameOf(t.toUserId)}?`
-                            : `¿Registrar que ${nameOf(t.fromUserId)} te pagó ${formatMoney(t.amountCents, group.currency)}?`
-                        }
+                        confirm={`¿Registrar ${formatMoney(t.amountCents, group.currency)}?`}
                       >
                         {iPay ? "✓ Ya le pagué" : "✓ Ya me pagó"}
                       </SubmitButton>

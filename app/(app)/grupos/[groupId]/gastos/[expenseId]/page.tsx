@@ -185,7 +185,7 @@ export default async function ExpenseDetailPage({
                 <SubmitButton
                   className="btn-ghost text-xs text-debt-500"
                   pendingLabel="Borrando…"
-                  confirm="¿Borrar este gasto? Se va a recalcular el saldo del grupo."
+                  confirm="¿Borrar el gasto?"
                 >
                   Borrar
                 </SubmitButton>

@@ -59,7 +59,7 @@ export default async function ProfilePage() {
           <SubmitButton
             className="btn-secondary text-sm"
             pendingLabel="Cerrando…"
-            confirm="¿Cerrar todas las sesiones? Vas a tener que volver a entrar."
+            confirm="¿Cerrar todas? Vas a tener que volver a entrar."
           >
             Cerrar todas las sesiones
           </SubmitButton>

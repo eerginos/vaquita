@@ -109,11 +109,7 @@ export default async function GroupSettingsPage({
                     <SubmitButton
                       className="btn-ghost px-2 py-1 text-xs text-debt-500"
                       pendingLabel="…"
-                      confirm={
-                        member.id === user.id
-                          ? "¿Salir de este grupo?"
-                          : `¿Sacar a ${member.name} del grupo?`
-                      }
+                      confirm={member.id === user.id ? "¿Salir del grupo?" : "¿Sacarlo del grupo?"}
                     >
                       {member.id === user.id ? "Salir" : "Sacar"}
                     </SubmitButton>
@@ -223,7 +219,7 @@ export default async function GroupSettingsPage({
                 <SubmitButton
                   className="btn-danger text-sm"
                   pendingLabel="Borrando…"
-                  confirm={`¿Eliminar "${group.name}" con todos sus gastos? Esto no se puede deshacer.`}
+                  confirm="¿Eliminar el grupo con todos sus gastos?"
                 >
                   Eliminar grupo
                 </SubmitButton>
