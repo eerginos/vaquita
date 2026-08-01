@@ -8,7 +8,6 @@ import type { ActionState } from "@/app/actions/expenses";
 import { CATEGORIES } from "@/lib/categories";
 import { centsToInput, formatMoney, parseAmountToCents, sum } from "@/lib/money";
 import { computePayers, computeShares, SPLIT_TYPES, type SplitType } from "@/lib/split";
-import { toDateInput } from "@/lib/dates";
 import { Avatar } from "@/components/avatar";
 import { FormError } from "@/components/form-error";
 import { SubmitButton } from "@/components/submit-button";
@@ -37,6 +36,7 @@ export function ExpenseForm({
   currentUserId,
   initial,
   cancelHref,
+  defaultDate,
 }: {
   action: (prev: ActionState, formData: FormData) => Promise<ActionState>;
   groupId: string;
@@ -45,6 +45,8 @@ export function ExpenseForm({
   currentUserId: string;
   initial?: ExpenseInitial;
   cancelHref: string;
+  /** Hoy según la zona horaria del servidor, no la del navegador. */
+  defaultDate: string;
 }) {
   const [state, formAction] = useActionState(action, initialState);
 
@@ -163,7 +165,7 @@ export function ExpenseForm({
               id="date"
               name="date"
               type="date"
-              defaultValue={initial?.date ?? toDateInput(new Date())}
+              defaultValue={initial?.date ?? defaultDate}
               className="input"
             />
           </div>
@@ -189,7 +191,7 @@ export function ExpenseForm({
       </div>
 
       {/* ------------------------------------------------------- quién pagó */}
-      <fieldset className="space-y-3 rounded-xl border p-4">
+      <fieldset className="space-y-3 rounded-xl border p-3 sm:p-4">
         <div className="flex items-center justify-between">
           <legend className="text-sm font-semibold">Quién pagó</legend>
           <button
@@ -228,7 +230,7 @@ export function ExpenseForm({
                     onChange={(e) =>
                       setPayerAmounts((prev) => ({ ...prev, [m.id]: e.target.value }))
                     }
-                    className="input w-32 text-right tabular-nums"
+                    className="input w-24 shrink-0 text-right tabular-nums sm:w-32"
                     placeholder="0,00"
                   />
                 </li>
@@ -242,7 +244,7 @@ export function ExpenseForm({
       </fieldset>
 
       {/* ---------------------------------------------------- cómo se divide */}
-      <fieldset className="space-y-3 rounded-xl border p-4">
+      <fieldset className="space-y-3 rounded-xl border p-3 sm:p-4">
         <legend className="text-sm font-semibold">Cómo se divide</legend>
 
         <div className="flex flex-wrap gap-1.5">
@@ -272,22 +274,29 @@ export function ExpenseForm({
             const amount = shareAmountOf(m.id);
 
             return (
-              <li key={m.id} className="flex items-center gap-3 px-3 py-2.5">
+              <li key={m.id} className="flex items-center gap-2.5 px-3 py-2.5 sm:gap-3">
                 <input
                   type="checkbox"
                   checked={included}
                   onChange={() => toggleParticipant(m.id)}
-                  className="h-4 w-4 accent-[var(--color-brand-600)]"
+                  className="h-4 w-4 shrink-0 accent-[var(--color-brand-600)]"
                   aria-label={`Incluir a ${m.name}`}
                 />
                 <Avatar name={m.name} color={m.color} size="sm" />
-                <span
-                  className={clsx(
-                    "min-w-0 flex-1 truncate text-sm",
-                    !included && "text-[var(--text-soft)] line-through",
-                  )}
-                >
-                  {m.name}
+
+                <span className="min-w-0 flex-1">
+                  <span
+                    className={clsx(
+                      "block truncate text-sm",
+                      !included && "text-[var(--text-soft)] line-through",
+                    )}
+                  >
+                    {m.name}
+                  </span>
+                  {/* En mobile el importe va debajo del nombre; en desktop tiene columna propia. */}
+                  <span className="block text-xs tabular-nums text-[var(--text-muted)] sm:hidden">
+                    {included && amount !== null ? formatMoney(amount, currency) : "—"}
+                  </span>
                 </span>
 
                 {included && splitType !== "EQUAL" && (
@@ -296,14 +305,14 @@ export function ExpenseForm({
                     inputMode="decimal"
                     value={shareValues[m.id] ?? ""}
                     onChange={(e) => setShare(m.id, e.target.value)}
-                    className="input w-28 text-right tabular-nums"
+                    className="input w-24 shrink-0 text-right tabular-nums sm:w-28"
                     placeholder={
                       splitType === "PERCENT" ? "0,00%" : splitType === "SHARES" ? "1" : "0,00"
                     }
                   />
                 )}
 
-                <span className="w-28 shrink-0 text-right text-sm tabular-nums text-[var(--text-muted)]">
+                <span className="hidden w-28 shrink-0 text-right text-sm tabular-nums text-[var(--text-muted)] sm:block">
                   {included && amount !== null ? formatMoney(amount, currency) : "—"}
                 </span>
               </li>

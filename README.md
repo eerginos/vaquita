@@ -81,6 +81,12 @@ contraseña `split1234`. **Ojo: el seed borra toda la base.**
    | `APP_URL` | `https://split.erginos.com.ar` |
    | `BOOTSTRAP_ADMIN_EMAIL` | Tu email |
 
+   La zona horaria ya viene fijada en el Dockerfile
+   (`TZ=America/Argentina/Buenos_Aires`). Las fechas se formatean en el
+   servidor, así que sin eso el contenedor correría en UTC y un gasto cargado
+   después de las 21:00 quedaría con la fecha del día siguiente. Si algún día
+   lo usás desde otro país, cambiá esa línea del Dockerfile.
+
 4. **Dominio**: poné `https://split.erginos.com.ar`. Coolify saca el
    certificado con Let's Encrypt solo.
 

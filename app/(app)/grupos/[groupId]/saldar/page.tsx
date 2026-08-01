@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { getGroupDetail } from "@/lib/queries";
 import { centsToInput, formatMoney } from "@/lib/money";
+import { toDateInput } from "@/lib/dates";
 import { SettleForm } from "./settle-form";
 
 export const metadata: Metadata = { title: "Saldar cuentas" };
@@ -59,6 +60,7 @@ export default async function SettlePage({
             toUserId: a ?? "",
             amountInput: monto ?? "",
           }}
+          defaultDate={toDateInput(new Date())}
         />
       </div>
     </div>

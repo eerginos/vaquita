@@ -5,7 +5,6 @@ import Link from "next/link";
 
 import { createSettlementAction, type ActionState } from "@/app/actions/settlements";
 import { formatMoney, parseAmountToCents } from "@/lib/money";
-import { toDateInput } from "@/lib/dates";
 import { FormError } from "@/components/form-error";
 import { SubmitButton } from "@/components/submit-button";
 
@@ -27,6 +26,7 @@ export function SettleForm({
   currentUserId,
   suggestions,
   preset,
+  defaultDate,
 }: {
   groupId: string;
   currency: string;
@@ -34,6 +34,8 @@ export function SettleForm({
   currentUserId: string;
   suggestions: Suggestion[];
   preset: { fromUserId: string; toUserId: string; amountInput: string };
+  /** Hoy según la zona horaria del servidor, no la del navegador. */
+  defaultDate: string;
 }) {
   const [state, action] = useActionState(createSettlementAction, initial);
 
@@ -142,7 +144,7 @@ export function SettleForm({
             id="date"
             name="date"
             type="date"
-            defaultValue={toDateInput(new Date())}
+            defaultValue={defaultDate}
             className="input"
           />
         </div>

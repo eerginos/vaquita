@@ -67,7 +67,7 @@ export default async function EditExpensePage({
       </Link>
       <h1 className="text-xl font-semibold tracking-tight">Editar gasto</h1>
 
-      <div className="card p-5">
+      <div className="card p-4 sm:p-5">
         <ExpenseForm
           action={updateExpenseAction}
           groupId={groupId}
@@ -76,6 +76,7 @@ export default async function EditExpensePage({
           currentUserId={user.id}
           initial={initial}
           cancelHref={`/grupos/${groupId}/gastos/${expenseId}`}
+          defaultDate={toDateInput(new Date())}
         />
       </div>
     </div>

@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { createExpenseAction } from "@/app/actions/expenses";
 import { ExpenseForm } from "@/components/expense-form";
+import { toDateInput } from "@/lib/dates";
 
 export const metadata: Metadata = { title: "Nuevo gasto" };
 
@@ -37,7 +38,7 @@ export default async function NewExpensePage({
       </Link>
       <h1 className="text-xl font-semibold tracking-tight">Nuevo gasto</h1>
 
-      <div className="card p-5">
+      <div className="card p-4 sm:p-5">
         <ExpenseForm
           action={createExpenseAction}
           groupId={groupId}
@@ -45,6 +46,7 @@ export default async function NewExpensePage({
           members={group.members.map((m) => m.user)}
           currentUserId={user.id}
           cancelHref={`/grupos/${groupId}`}
+          defaultDate={toDateInput(new Date())}
         />
       </div>
     </div>

@@ -34,6 +34,13 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
+# Las fechas se renderizan en el servidor. Sin TZ el contenedor corre en UTC y
+# un gasto cargado después de las 21:00 ART aparecería con la fecha de mañana.
+# Node resuelve TZ con su propia base de zonas; tzdata es para que el sistema
+# (logs, `date`) también quede en hora argentina.
+RUN apk add --no-cache tzdata
+ENV TZ=America/Argentina/Buenos_Aires
+
 RUN addgroup -S -g 1001 nodejs && adduser -S -u 1001 -G nodejs nextjs
 
 COPY --from=prod-deps --chown=nextjs:nodejs /app/node_modules ./node_modules
