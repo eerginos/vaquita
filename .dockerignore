@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+.github
+.claude
+.env
+.env.local
+*.md
+!README.md
+lib/generated
+skills-lock.json

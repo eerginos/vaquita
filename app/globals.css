@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+
+  --color-brand-50: #eefbf6;
+  --color-brand-100: #d5f5e8;
+  --color-brand-200: #aeead4;
+  --color-brand-300: #79d8ba;
+  --color-brand-400: #43be9b;
+  --color-brand-500: #1fa382;
+  --color-brand-600: #128268;
+  --color-brand-700: #106856;
+  --color-brand-800: #105345;
+  --color-brand-900: #0f453b;
+
+  --color-owed-500: #16a34a;
+  --color-owed-400: #4ade80;
+  --color-debt-500: #e05252;
+  --color-debt-400: #f87171;
+}
+
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-2: #f9fafb;
+  --border: #e5e7eb;
+  --text: #111827;
+  --text-muted: #6b7280;
+  --text-soft: #9ca3af;
+  --ring: rgba(18, 130, 104, 0.35);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface-2: #1c2129;
+    --border: #2a313c;
+    --text: #e6edf3;
+    --text-muted: #9198a1;
+    --text-soft: #6e7681;
+    --ring: rgba(67, 190, 155, 0.4);
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--border);
+  --color-ink: var(--text);
+  --color-muted: var(--text-muted);
+  --color-soft: var(--text-soft);
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-brand-200);
+  color: var(--color-brand-900);
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl border bg-[var(--surface)] shadow-[0_1px_2px_rgba(0,0,0,0.04)];
+  }
+
+  /* Tailwind v4 no deja hacer @apply de otra clase custom, así que la base
+     de los botones se repite en cada variante. */
+  .btn,
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger {
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border
+           px-3.5 py-2 text-sm font-medium transition-colors
+           disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply border-transparent bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800;
+  }
+
+  .btn-secondary {
+    @apply bg-[var(--surface)] text-[var(--text)] hover:bg-[var(--surface-2)];
+  }
+
+  .btn-ghost {
+    @apply border-transparent text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)];
+  }
+
+  .btn-danger {
+    @apply border-transparent bg-debt-500 text-white hover:brightness-95;
+  }
+
+  .input {
+    @apply w-full rounded-lg border bg-[var(--surface)] px-3 py-2 text-sm text-[var(--text)]
+           outline-none transition
+           placeholder:text-[var(--text-soft)]
+           focus:border-brand-500 focus:ring-3 focus:ring-[var(--ring)]
+           disabled:opacity-60;
+  }
+
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-[var(--text)];
+  }
+
+  .hint {
+    @apply text-xs text-[var(--text-muted)];
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium;
+  }
+}
+
+/* Oculta las flechitas de los input numéricos */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}

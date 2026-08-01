@@ -1,0 +1,5 @@
+* text=auto eol=lf
+
+# El entrypoint corre en Alpine: con CRLF el shebang no resuelve.
+*.sh text eol=lf
+Dockerfile text eol=lf
