@@ -13,7 +13,11 @@ import { isInviteUsable } from "@/lib/invites";
  * corre una sola vez por request, a diferencia del render de un componente.
  */
 export async function GET(request: NextRequest) {
-  const to = (path: string) => NextResponse.redirect(new URL(path, request.nextUrl));
+  // Location relativo a propósito: detrás del proxy de Coolify, la URL del
+  // request es la interna del contenedor (0.0.0.0:3000), así que armar una
+  // URL absoluta con ella mandaba al navegador a una dirección que no existe.
+  // Un Location relativo lo resuelve el navegador contra el dominio real.
+  const to = (path: string) => new NextResponse(null, { status: 303, headers: { Location: path } });
 
   const code = request.nextUrl.searchParams.get("code");
   if (!code) return to("/invitacion/estado?e=falta");
