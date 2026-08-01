@@ -4,8 +4,16 @@ export type SplitType = "EQUAL" | "EXACT" | "PERCENT" | "SHARES";
 
 export const SPLIT_TYPES: { id: SplitType; label: string; hint: string }[] = [
   { id: "EQUAL", label: "Partes iguales", hint: "Se divide en partes iguales entre los seleccionados." },
-  { id: "EXACT", label: "Montos exactos", hint: "Indicá cuánto le toca a cada uno. La suma tiene que dar el total." },
-  { id: "PERCENT", label: "Porcentajes", hint: "Indicá el porcentaje de cada uno. Tiene que sumar 100%." },
+  {
+    id: "EXACT",
+    label: "Montos exactos",
+    hint: "Escribí el monto de uno y el resto se reparte solo entre los demás. Seguí escribiendo los que quieras fijar.",
+  },
+  {
+    id: "PERCENT",
+    label: "Porcentajes",
+    hint: "Escribí el porcentaje de uno y el resto se reparte solo entre los demás. Tiene que sumar 100%.",
+  },
   { id: "SHARES", label: "Partes", hint: "Por ejemplo 2 partes para una pareja y 1 para cada soltero." },
 ];
 

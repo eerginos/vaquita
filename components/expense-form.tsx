@@ -6,7 +6,7 @@ import clsx from "clsx";
 
 import type { ActionState } from "@/app/actions/expenses";
 import { CATEGORIES } from "@/lib/categories";
-import { centsToInput, formatMoney, parseAmountToCents, sum } from "@/lib/money";
+import { centsToInput, formatMoney, parseAmountToCents, splitEvenly, sum } from "@/lib/money";
 import { computePayers, computeShares, SPLIT_TYPES, type SplitType } from "@/lib/split";
 import { Avatar } from "@/components/avatar";
 import { FormError } from "@/components/form-error";
@@ -63,6 +63,14 @@ export function ExpenseForm({
   const [participants, setParticipants] = useState<string[]>(
     () => initial?.shares.map((s) => s.userId) ?? members.map((m) => m.id),
   );
+  // Participantes cuyo monto escribió la persona a mano. El resto se completa
+  // solo con lo que sobra, repartido en partes iguales.
+  const [touchedShares, setTouchedShares] = useState<string[]>(() =>
+    initial && (initial.splitType === "EXACT" || initial.splitType === "PERCENT")
+      ? initial.shares.map((s) => s.userId)
+      : [],
+  );
+
   const [shareValues, setShareValues] = useState<Record<string, string>>(() => {
     if (!initial) return {};
     return Object.fromEntries(
@@ -79,9 +87,44 @@ export function ExpenseForm({
 
   const totalCents = parseAmountToCents(amountInput) ?? 0n;
 
+  /**
+   * Autocompletado del reparto: lo que queda después de los montos escritos
+   * a mano se divide en partes iguales entre los que todavía no se tocaron.
+   * Gasto de 100.000 entre 4 → si A pone 40.000, B, C y D quedan en 20.000;
+   * si después B pone 40.000, C y D pasan a 10.000.
+   */
+  const autoShares = useMemo(() => {
+    if (splitType !== "EXACT" && splitType !== "PERCENT") return {};
+
+    const target = splitType === "PERCENT" ? 10_000n : totalCents;
+    const untouched = participants.filter((id) => !touchedShares.includes(id));
+    if (untouched.length === 0 || target <= 0n) return {};
+
+    let assigned = 0n;
+    for (const id of participants) {
+      if (!touchedShares.includes(id)) continue;
+      assigned += parseAmountToCents(shareValues[id] ?? "") ?? 0n;
+    }
+
+    const remaining = target - assigned;
+    const parts =
+      remaining > 0n ? splitEvenly(remaining, untouched.length) : untouched.map(() => 0n);
+
+    return Object.fromEntries(untouched.map((id, i) => [id, centsToInput(parts[i])]));
+  }, [splitType, totalCents, participants, touchedShares, shareValues]);
+
+  /** Lo que realmente se manda: escrito a mano donde lo hay, autocompletado en el resto. */
+  const effectiveShares = useMemo(() => {
+    const out: Record<string, string> = {};
+    for (const id of participants) {
+      out[id] = touchedShares.includes(id) ? (shareValues[id] ?? "") : (autoShares[id] ?? "");
+    }
+    return out;
+  }, [participants, touchedShares, shareValues, autoShares]);
+
   const preview = useMemo(
-    () => computeShares(totalCents, splitType, participants, shareValues),
-    [totalCents, splitType, participants, shareValues],
+    () => computeShares(totalCents, splitType, participants, effectiveShares),
+    [totalCents, splitType, participants, effectiveShares],
   );
 
   const payersPreview = useMemo(() => {
@@ -94,13 +137,34 @@ export function ExpenseForm({
     );
   }, [payerMode, payerId, payerAmounts, amountInput, totalCents, members]);
 
+  /**
+   * Cambiar de tipo de división limpia lo escrito: un monto de 90.000 no
+   * significa nada como porcentaje ni como cantidad de partes.
+   */
+  const changeSplitType = (next: SplitType) => {
+    setSplitType(next);
+    setTouchedShares([]);
+    setShareValues(
+      next === "SHARES" ? Object.fromEntries(members.map((m) => [m.id, "1"])) : {},
+    );
+  };
+
   const toggleParticipant = (id: string) =>
     setParticipants((prev) =>
       prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
     );
 
-  const setShare = (id: string, value: string) =>
+  const setShare = (id: string, value: string) => {
     setShareValues((prev) => ({ ...prev, [id]: value }));
+    // Vaciar el campo lo devuelve al reparto automático.
+    setTouchedShares((prev) =>
+      value.trim() === ""
+        ? prev.filter((p) => p !== id)
+        : prev.includes(id)
+          ? prev
+          : [...prev, id],
+    );
+  };
 
   const orderedParticipants = members.filter((m) => participants.includes(m.id));
   const shareAmountOf = (userId: string) => {
@@ -249,7 +313,7 @@ export function ExpenseForm({
             <button
               key={option.id}
               type="button"
-              onClick={() => setSplitType(option.id)}
+              onClick={() => changeSplitType(option.id)}
               className={clsx(
                 "rounded-lg border px-3 py-1.5 text-xs font-medium transition",
                 splitType === option.id
@@ -263,7 +327,18 @@ export function ExpenseForm({
           ))}
         </div>
 
-        <p className="hint">{SPLIT_TYPES.find((s) => s.id === splitType)!.hint}</p>
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <p className="hint">{SPLIT_TYPES.find((s) => s.id === splitType)!.hint}</p>
+          {(splitType === "EXACT" || splitType === "PERCENT") && touchedShares.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setTouchedShares([])}
+              className="shrink-0 text-xs font-medium text-brand-600 hover:underline"
+            >
+              Volver a repartir parejo
+            </button>
+          )}
+        </div>
 
         <ul className="divide-y rounded-lg border">
           {members.map((m) => {
@@ -311,10 +386,20 @@ export function ExpenseForm({
                 {included && (splitType === "EXACT" || splitType === "PERCENT") && (
                   <MoneyInput
                     name={`share:${m.id}`}
-                    value={shareValues[m.id] ?? ""}
+                    value={effectiveShares[m.id] ?? ""}
                     onChange={(next) => setShare(m.id, next)}
-                    className="w-24 shrink-0 text-right sm:w-28"
-                    placeholder={splitType === "PERCENT" ? "0,00" : "0,00"}
+                    title={
+                      touchedShares.includes(m.id)
+                        ? undefined
+                        : "Calculado solo con lo que queda. Escribí un monto para fijarlo."
+                    }
+                    className={clsx(
+                      "w-24 shrink-0 text-right sm:w-28",
+                      // Los autocompletados se ven apagados para distinguirlos
+                      // de los que escribió la persona.
+                      !touchedShares.includes(m.id) && "text-[var(--text-muted)] italic",
+                    )}
+                    placeholder="0,00"
                   />
                 )}
 
