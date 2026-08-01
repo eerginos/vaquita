@@ -7,7 +7,7 @@ import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { fromDateInput } from "@/lib/dates";
 import { parseAmountToCents } from "@/lib/money";
-import { computePayers, computeShares, type SplitType } from "@/lib/split";
+import { computePayers, computeShares, resplitWith, type SplitType } from "@/lib/split";
 import { getCategory } from "@/lib/categories";
 
 export type ActionState = { error?: string; success?: string };
@@ -226,6 +226,90 @@ export async function updateExpenseAction(
   revalidatePath(`/grupos/${existing.groupId}`, "layout");
   revalidatePath("/");
   redirect(`/grupos/${existing.groupId}/gastos/${expenseId}`);
+}
+
+/**
+ * Suma gente a gastos que ya estaban cargados y recalcula el reparto.
+ * Resuelve el caso típico: armaste el grupo, cargaste gastos y recién
+ * después se sumaron los que faltaban.
+ */
+export async function includeInExpensesAction(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const user = await requireUser();
+  const groupId = text(formData, "groupId");
+
+  const membership = await prisma.groupMember.findUnique({
+    where: { groupId_userId: { groupId, userId: user.id } },
+  });
+  if (!membership) return { error: "No sos miembro de este grupo." };
+
+  const group = await prisma.group.findUniqueOrThrow({ where: { id: groupId } });
+  if (group.archivedAt) return { error: "El grupo está archivado." };
+
+  const addedUserIds = formData.getAll("addedUserIds").map(String).filter(Boolean);
+  const expenseIds = formData.getAll("expenseIds").map(String).filter(Boolean);
+
+  if (addedUserIds.length === 0) return { error: "Elegí a quién querés sumar." };
+  if (expenseIds.length === 0) return { error: "Elegí al menos un gasto." };
+
+  const members = await prisma.groupMember.findMany({
+    where: { groupId, userId: { in: addedUserIds } },
+    select: { userId: true, user: { select: { name: true } } },
+  });
+  if (members.length !== addedUserIds.length) {
+    return { error: "Todas las personas tienen que ser miembros del grupo." };
+  }
+
+  const expenses = await prisma.expense.findMany({
+    where: { id: { in: expenseIds }, groupId, deletedAt: null },
+    include: { shares: { select: { userId: true, weight: true } } },
+  });
+
+  let updated = 0;
+
+  await prisma.$transaction(async (tx) => {
+    for (const expense of expenses) {
+      const shares = resplitWith(
+        expense.amountCents,
+        expense.splitType,
+        expense.shares,
+        addedUserIds,
+      );
+      // null = montos exactos o porcentajes: no se puede repartir solo.
+      if (!shares) continue;
+
+      await tx.expenseShare.deleteMany({ where: { expenseId: expense.id } });
+      await tx.expense.update({
+        where: { id: expense.id },
+        data: { shares: { create: shares } },
+      });
+      updated++;
+    }
+
+    if (updated > 0) {
+      await tx.activity.create({
+        data: {
+          type: "EXPENSES_RESPLIT",
+          groupId,
+          actorId: user.id,
+          meta: {
+            names: members.map((m) => m.user.name),
+            count: updated,
+          },
+        },
+      });
+    }
+  });
+
+  if (updated === 0) {
+    return { error: "Ninguno de los gastos elegidos se puede recalcular automáticamente." };
+  }
+
+  revalidatePath(`/grupos/${groupId}`, "layout");
+  revalidatePath("/");
+  redirect(`/grupos/${groupId}`);
 }
 
 export async function deleteExpenseAction(formData: FormData): Promise<void> {

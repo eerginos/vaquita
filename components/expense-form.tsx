@@ -10,6 +10,7 @@ import { centsToInput, formatMoney, parseAmountToCents, sum } from "@/lib/money"
 import { computePayers, computeShares, SPLIT_TYPES, type SplitType } from "@/lib/split";
 import { Avatar } from "@/components/avatar";
 import { FormError } from "@/components/form-error";
+import { MoneyInput } from "@/components/money-input";
 import { SubmitButton } from "@/components/submit-button";
 
 export type Member = { id: string; name: string; color: string };
@@ -142,14 +143,13 @@ export function ExpenseForm({
             <label className="label" htmlFor="amount">
               Importe ({currency})
             </label>
-            <input
+            <MoneyInput
               id="amount"
               name="amount"
               required
-              inputMode="decimal"
               value={amountInput}
-              onChange={(e) => setAmountInput(e.target.value)}
-              className="input text-lg font-semibold tabular-nums"
+              onChange={setAmountInput}
+              className="text-lg font-semibold"
               placeholder="0,00"
             />
             {totalCents > 0n && (
@@ -223,14 +223,11 @@ export function ExpenseForm({
                 <li key={m.id} className="flex items-center gap-3">
                   <Avatar name={m.name} color={m.color} size="sm" />
                   <span className="min-w-0 flex-1 truncate text-sm">{m.name}</span>
-                  <input
+                  <MoneyInput
                     name={`payer:${m.id}`}
-                    inputMode="decimal"
                     value={payerAmounts[m.id] ?? ""}
-                    onChange={(e) =>
-                      setPayerAmounts((prev) => ({ ...prev, [m.id]: e.target.value }))
-                    }
-                    className="input w-24 shrink-0 text-right tabular-nums sm:w-32"
+                    onChange={(next) => setPayerAmounts((prev) => ({ ...prev, [m.id]: next }))}
+                    className="w-24 shrink-0 text-right sm:w-32"
                     placeholder="0,00"
                   />
                 </li>
@@ -299,16 +296,25 @@ export function ExpenseForm({
                   </span>
                 </span>
 
-                {included && splitType !== "EQUAL" && (
+                {/* Las "partes" son un entero, no plata: ese va sin formatear. */}
+                {included && splitType === "SHARES" && (
                   <input
                     name={`share:${m.id}`}
-                    inputMode="decimal"
+                    inputMode="numeric"
                     value={shareValues[m.id] ?? ""}
-                    onChange={(e) => setShare(m.id, e.target.value)}
+                    onChange={(e) => setShare(m.id, e.target.value.replace(/\D/g, ""))}
                     className="input w-24 shrink-0 text-right tabular-nums sm:w-28"
-                    placeholder={
-                      splitType === "PERCENT" ? "0,00%" : splitType === "SHARES" ? "1" : "0,00"
-                    }
+                    placeholder="1"
+                  />
+                )}
+
+                {included && (splitType === "EXACT" || splitType === "PERCENT") && (
+                  <MoneyInput
+                    name={`share:${m.id}`}
+                    value={shareValues[m.id] ?? ""}
+                    onChange={(next) => setShare(m.id, next)}
+                    className="w-24 shrink-0 text-right sm:w-28"
+                    placeholder={splitType === "PERCENT" ? "0,00" : "0,00"}
                   />
                 )}
 

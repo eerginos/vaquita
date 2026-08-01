@@ -129,6 +129,19 @@ export default async function GroupSettingsPage({
             <AddMembersForm groupId={groupId} candidates={candidates} />
           </div>
         )}
+
+        {hasMovements > 0 && !group.archivedAt && (
+          <div className="border-t p-5">
+            <p className="text-sm font-medium">¿Alguien se sumó tarde?</p>
+            <p className="hint mt-0.5 mb-3">
+              Si cargaste gastos antes de que estuvieran todos, podés agregarlos a los gastos
+              anteriores y recalcular el reparto de una sola vez.
+            </p>
+            <Link href={`/grupos/${groupId}/incluir`} className="btn-secondary text-sm">
+              Sumar a gastos anteriores
+            </Link>
+          </div>
+        )}
       </section>
 
       <section className="card">

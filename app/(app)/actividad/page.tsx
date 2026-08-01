@@ -17,6 +17,7 @@ const ICONS: Record<string, string> = {
   EXPENSE_CREATED: "🧾",
   EXPENSE_UPDATED: "✏️",
   EXPENSE_DELETED: "🗑️",
+  EXPENSES_RESPLIT: "🔄",
   SETTLEMENT_CREATED: "💸",
   SETTLEMENT_DELETED: "↩️",
   COMMENT_ADDED: "💬",
@@ -30,35 +31,48 @@ type Meta = {
   fromName?: string;
   toName?: string;
   preview?: string;
+  names?: string[];
+  count?: number;
 };
 
-function describe(type: string, actor: string, meta: Meta): React.ReactNode {
+function describe(type: string, actorName: string, isMe: boolean, meta: Meta): React.ReactNode {
   const amount =
     meta.amountCents !== undefined
       ? formatMoney(BigInt(meta.amountCents), meta.currency ?? "ARS")
       : null;
 
+  // "Vos agregó" suena horrible: cuando el actor es quien mira, va en segunda persona.
+  const verb = (segunda: string, tercera: string) =>
+    isMe ? segunda : `${actorName} ${tercera}`;
+
+  const listar = (names: string[]) =>
+    names.length > 1 ? `${names.slice(0, -1).join(", ")} y ${names.at(-1)}` : (names[0] ?? "alguien");
+
   switch (type) {
     case "GROUP_CREATED":
-      return `${actor} creó el grupo`;
+      return verb("Creaste el grupo", "creó el grupo");
     case "MEMBER_JOINED":
       return `${meta.name ?? "Alguien"} se sumó al grupo`;
     case "MEMBER_LEFT":
       return `${meta.name ?? "Alguien"} salió del grupo`;
     case "EXPENSE_CREATED":
-      return `${actor} agregó "${meta.description}" por ${amount}`;
+      return `${verb("Agregaste", "agregó")} "${meta.description}" por ${amount}`;
     case "EXPENSE_UPDATED":
-      return `${actor} editó "${meta.description}" — ahora ${amount}`;
+      return `${verb("Editaste", "editó")} "${meta.description}" — ahora ${amount}`;
     case "EXPENSE_DELETED":
-      return `${actor} borró "${meta.description}" de ${amount}`;
+      return `${verb("Borraste", "borró")} "${meta.description}" de ${amount}`;
+    case "EXPENSES_RESPLIT":
+      return `${verb("Sumaste", "sumó")} a ${listar(meta.names ?? [])} a ${meta.count} ${
+        meta.count === 1 ? "gasto anterior" : "gastos anteriores"
+      } y se recalcularon los saldos`;
     case "SETTLEMENT_CREATED":
       return `${meta.fromName} le pagó ${amount} a ${meta.toName}`;
     case "SETTLEMENT_DELETED":
-      return `${actor} anuló el pago de ${meta.fromName} a ${meta.toName} (${amount})`;
+      return `${verb("Anulaste", "anuló")} el pago de ${meta.fromName} a ${meta.toName} (${amount})`;
     case "COMMENT_ADDED":
-      return `${actor} comentó: "${meta.preview}"`;
+      return `${verb("Comentaste", "comentó")}: "${meta.preview}"`;
     default:
-      return `${actor} hizo algo`;
+      return verb("Hiciste algo", "hizo algo");
   }
 }
 
@@ -78,8 +92,8 @@ export default async function ActivityPage() {
         <ul className="card divide-y">
           {activities.map((activity) => {
             const meta = (activity.meta ?? {}) as Meta;
-            const actorName = activity.actor.id === user.id ? "Vos" : activity.actor.name;
-            const body = describe(activity.type, actorName, meta);
+            const isMe = activity.actor.id === user.id;
+            const body = describe(activity.type, activity.actor.name, isMe, meta);
 
             const row = (
               <div className="flex items-start gap-3 px-4 py-3">

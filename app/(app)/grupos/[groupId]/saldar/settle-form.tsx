@@ -6,6 +6,7 @@ import Link from "next/link";
 import { createSettlementAction, type ActionState } from "@/app/actions/settlements";
 import { formatMoney, parseAmountToCents } from "@/lib/money";
 import { FormError } from "@/components/form-error";
+import { MoneyInput } from "@/components/money-input";
 import { SubmitButton } from "@/components/submit-button";
 
 type Member = { id: string; name: string; color: string };
@@ -121,14 +122,13 @@ export function SettleForm({
           <label className="label" htmlFor="amount">
             Importe ({currency})
           </label>
-          <input
+          <MoneyInput
             id="amount"
             name="amount"
             required
-            inputMode="decimal"
             value={amountInput}
-            onChange={(e) => setAmountInput(e.target.value)}
-            className="input text-lg font-semibold tabular-nums"
+            onChange={setAmountInput}
+            className="text-lg font-semibold"
             placeholder="0,00"
           />
           {cents !== null && cents > 0n && (

@@ -124,6 +124,51 @@ export function computeShares(
   }
 }
 
+/**
+ * Recalcula el reparto de un gasto ya cargado sumando participantes nuevos.
+ *
+ * Devuelve null si el gasto no se puede recalcular solo: con montos exactos o
+ * porcentajes no hay forma de adivinar cuánto le corresponde a quien entra,
+ * esos hay que editarlos a mano.
+ */
+export function resplitWith(
+  amountCents: bigint,
+  splitType: SplitType,
+  currentShares: { userId: string; weight: number | null }[],
+  addedUserIds: string[],
+): Share[] | null {
+  const already = new Set(currentShares.map((s) => s.userId));
+  const incoming = addedUserIds.filter((id) => !already.has(id));
+  if (incoming.length === 0) return null;
+
+  if (splitType === "EQUAL") {
+    const userIds = [...currentShares.map((s) => s.userId), ...incoming];
+    const parts = splitEvenly(amountCents, userIds.length);
+    return userIds.map((userId, i) => ({ userId, amountCents: parts[i], weight: null }));
+  }
+
+  if (splitType === "SHARES") {
+    // Los que ya estaban conservan sus partes; el que entra arranca con una.
+    const entries = [
+      ...currentShares.map((s) => ({ userId: s.userId, weight: s.weight ?? 1 })),
+      ...incoming.map((userId) => ({ userId, weight: 1 })),
+    ];
+    const amounts = allocateByWeights(amountCents, entries.map((e) => e.weight));
+    return entries.map((e, i) => ({
+      userId: e.userId,
+      amountCents: amounts[i],
+      weight: e.weight,
+    }));
+  }
+
+  return null;
+}
+
+/** Si un gasto se puede recalcular automáticamente al sumar gente. */
+export function canResplit(splitType: SplitType): boolean {
+  return splitType === "EQUAL" || splitType === "SHARES";
+}
+
 /** Quién puso la plata. Devuelve error si la suma no coincide con el total. */
 export function computePayers(
   totalCents: bigint,

@@ -69,6 +69,11 @@ export function parseAmountToCents(raw: string): bigint | null {
   return negative ? -cents : cents;
 }
 
+/** Mete el punto de miles: "1234567" -> "1.234.567". */
+export function groupThousands(digits: string): string {
+  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
 /** Centavos -> "1.234,56" (sin símbolo). */
 export function centsToInput(cents: bigint | number): string {
   const value = typeof cents === "bigint" ? cents : BigInt(Math.round(cents));
@@ -76,7 +81,53 @@ export function centsToInput(cents: bigint | number): string {
   const abs = negative ? -value : value;
   const whole = abs / 100n;
   const frac = abs % 100n;
-  return `${negative ? "-" : ""}${whole.toString()},${frac.toString().padStart(2, "0")}`;
+  return `${negative ? "-" : ""}${groupThousands(whole.toString())},${frac.toString().padStart(2, "0")}`;
+}
+
+/**
+ * Normaliza lo que se va tecleando en un campo de importe:
+ * agrega los puntos de miles y deja como mucho dos decimales
+ * después de la coma. No completa los decimales faltantes,
+ * así se puede seguir escribiendo.
+ */
+export function formatAmountInput(raw: string): string {
+  let cleaned = raw.replace(/[^\d,]/g, "");
+
+  // Sólo la primera coma cuenta como separador decimal.
+  const firstComma = cleaned.indexOf(",");
+  if (firstComma !== -1) {
+    cleaned =
+      cleaned.slice(0, firstComma + 1) + cleaned.slice(firstComma + 1).replace(/,/g, "");
+  }
+
+  const [rawInt, rawDec] = cleaned.split(",");
+  const integer = rawInt.replace(/^0+(?=\d)/, "");
+  const decimals = rawDec === undefined ? undefined : rawDec.slice(0, 2);
+
+  if (decimals === undefined) return groupThousands(integer);
+  return `${groupThousands(integer) || "0"},${decimals}`;
+}
+
+/**
+ * Posición del cursor después de reformatear: se cuenta cuántos caracteres
+ * "de verdad" (dígitos y coma) había antes del cursor y se busca esa misma
+ * cantidad en el texto ya formateado, así los puntos que se agregan solos
+ * no descolocan el cursor.
+ */
+export function caretAfterFormatting(formatted: string, significantBefore: number): number {
+  if (significantBefore <= 0) return 0;
+  let seen = 0;
+  for (let i = 0; i < formatted.length; i++) {
+    if (/[\d,]/.test(formatted[i])) {
+      seen++;
+      if (seen === significantBefore) return i + 1;
+    }
+  }
+  return formatted.length;
+}
+
+export function countSignificant(text: string): number {
+  return (text.match(/[\d,]/g) ?? []).length;
 }
 
 export function formatMoney(cents: bigint | number, currency = "ARS"): string {
