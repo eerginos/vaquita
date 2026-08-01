@@ -40,7 +40,7 @@ export default async function GroupSettingsPage({
     prisma.user.findMany({
       where: { id: { notIn: memberIds } },
       orderBy: { name: "asc" },
-      select: { id: true, name: true, email: true, color: true },
+      select: { id: true, name: true, email: true, color: true, emoji: true },
     }),
     prisma.invitation.findMany({
       where: { groupId, usedAt: null, expiresAt: { gt: new Date() } },
@@ -84,7 +84,7 @@ export default async function GroupSettingsPage({
 
             return (
               <li key={member.id} className="flex items-center gap-3 px-5 py-3">
-                <Avatar name={member.name} color={member.color} size="sm" />
+                <Avatar name={member.name} color={member.color} emoji={member.emoji} size="sm" />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium">
                     {member.name}

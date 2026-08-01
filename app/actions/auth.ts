@@ -14,7 +14,8 @@ import {
   requireUser,
   verifyPassword,
 } from "@/lib/auth";
-import { colorForSeed, USER_COLORS } from "@/lib/colors";
+import { colorForSeed } from "@/lib/colors";
+import { emojiForSeed, isValidUserEmoji } from "@/lib/emojis";
 
 export type ActionState = { error?: string; success?: string };
 
@@ -85,6 +86,7 @@ export async function signUpAction(
         email,
         passwordHash,
         color: colorForSeed(email),
+        emoji: emojiForSeed(email),
         isAdmin: isBootstrap,
       },
     });
@@ -130,12 +132,12 @@ export async function updateProfileAction(
 ): Promise<ActionState> {
   const user = await requireUser();
   const name = text(formData, "name");
-  const color = text(formData, "color");
+  const emoji = text(formData, "emoji");
 
   if (name.length < 2) return { error: "El nombre necesita al menos 2 caracteres." };
-  if (!USER_COLORS.includes(color)) return { error: "Ese color no está disponible." };
+  if (!isValidUserEmoji(emoji)) return { error: "Ese emoji no está en la paleta." };
 
-  await prisma.user.update({ where: { id: user.id }, data: { name, color } });
+  await prisma.user.update({ where: { id: user.id }, data: { name, emoji } });
   revalidatePath("/", "layout");
 
   return { success: "Perfil actualizado." };

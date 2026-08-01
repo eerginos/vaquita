@@ -19,6 +19,9 @@ model User {
   email        String   @unique
   name         String
   passwordHash String
+  /// Emoji que identifica a la persona. Si está vacío se deriva del nombre.
+  emoji        String?
+  /// Tinte del círculo del avatar. Se asigna solo, no se elige.
   color        String   @default("#6366f1")
   isAdmin      Boolean  @default(false)
   createdAt    DateTime @default(now())

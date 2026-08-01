@@ -33,7 +33,7 @@ export default async function PeoplePage() {
         <ul className="card divide-y">
           {people.map((person) => (
             <li key={person.user.id} className="flex items-center gap-3 px-4 py-3.5">
-              <Avatar name={person.user.name} color={person.user.color} />
+              <Avatar name={person.user.name} color={person.user.color} emoji={person.user.emoji} />
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">{person.user.name}</p>
                 <div className="mt-0.5 space-y-0.5">

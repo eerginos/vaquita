@@ -1,10 +1,17 @@
 import clsx from "clsx";
+import { emojiForSeed } from "@/lib/emojis";
 
 const SIZES = {
-  xs: "h-6 w-6 text-[10px]",
-  sm: "h-8 w-8 text-xs",
-  md: "h-10 w-10 text-sm",
-  lg: "h-14 w-14 text-lg",
+  xs: "h-6 w-6 text-[13px]",
+  sm: "h-8 w-8 text-base",
+  md: "h-10 w-10 text-xl",
+  lg: "h-14 w-14 text-3xl",
+};
+
+export type Person = {
+  name: string;
+  color?: string | null;
+  emoji?: string | null;
 };
 
 export function initialsOf(name: string): string {
@@ -17,47 +24,47 @@ export function initialsOf(name: string): string {
 export function Avatar({
   name,
   color,
+  emoji,
   size = "md",
   className,
-}: {
-  name: string;
-  color?: string | null;
+}: Person & {
   size?: keyof typeof SIZES;
   className?: string;
 }) {
+  // Quien no eligió emoji igual tiene uno, derivado del nombre.
+  const glyph = emoji || emojiForSeed(name);
+  const tint = color || "#6366f1";
+
   return (
     <span
       className={clsx(
-        "inline-flex shrink-0 select-none items-center justify-center rounded-full font-semibold text-white",
+        "inline-flex shrink-0 select-none items-center justify-center rounded-full leading-none",
         SIZES[size],
         className,
       )}
-      style={{ backgroundColor: color || "#6366f1" }}
+      // El color pasa a ser un fondo suave: el que identifica es el emoji.
+      style={{ backgroundColor: `${tint}26`, boxShadow: `inset 0 0 0 1.5px ${tint}59` }}
       title={name}
-      aria-hidden
+      role="img"
+      aria-label={name}
     >
-      {initialsOf(name)}
+      {glyph}
     </span>
   );
 }
 
-export function AvatarStack({
-  people,
-  max = 4,
-}: {
-  people: { name: string; color?: string | null }[];
-  max?: number;
-}) {
+export function AvatarStack({ people, max = 4 }: { people: Person[]; max?: number }) {
   const shown = people.slice(0, max);
   const rest = people.length - shown.length;
 
   return (
-    <span className="flex items-center -space-x-2">
+    <span className="flex items-center -space-x-1.5">
       {shown.map((p, i) => (
         <Avatar
           key={`${p.name}-${i}`}
           name={p.name}
           color={p.color}
+          emoji={p.emoji}
           size="xs"
           className="ring-2 ring-[var(--surface)]"
         />

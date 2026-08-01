@@ -16,6 +16,7 @@ export type CurrentUser = {
   email: string;
   name: string;
   color: string;
+  emoji: string | null;
   isAdmin: boolean;
 };
 
@@ -90,6 +91,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     email: user.email,
     name: user.name,
     color: user.color,
+    emoji: user.emoji,
     isAdmin: user.isAdmin,
   };
 });

@@ -1,4 +1,4 @@
-import "server-only";
+﻿import "server-only";
 
 import { prisma } from "@/lib/db";
 import { settlementPlan, type Transfer } from "@/lib/balances";
@@ -8,6 +8,7 @@ export type MemberLite = {
   name: string;
   email: string;
   color: string;
+  emoji: string | null;
   role: "OWNER" | "MEMBER";
 };
 
@@ -60,7 +61,7 @@ export type GroupSummary = {
   emoji: string;
   currency: string;
   archivedAt: Date | null;
-  members: { id: string; name: string; color: string }[];
+  members: { id: string; name: string; color: string; emoji: string | null }[];
   myBalanceCents: bigint;
   expenseCount: number;
 };
@@ -72,7 +73,7 @@ export async function getUserGroups(userId: string): Promise<GroupSummary[]> {
     include: {
       members: {
         orderBy: { joinedAt: "asc" },
-        select: { user: { select: { id: true, name: true, color: true } } },
+        select: { user: { select: { id: true, name: true, color: true, emoji: true } } },
       },
       _count: { select: { expenses: { where: { deletedAt: null } } } },
     },
@@ -122,7 +123,7 @@ export async function getGroupDetail(groupId: string): Promise<GroupDetail | nul
         orderBy: { joinedAt: "asc" },
         select: {
           role: true,
-          user: { select: { id: true, name: true, email: true, color: true } },
+          user: { select: { id: true, name: true, email: true, color: true, emoji: true } },
         },
       },
     },
@@ -135,6 +136,7 @@ export async function getGroupDetail(groupId: string): Promise<GroupDetail | nul
     name: m.user.name,
     email: m.user.email,
     color: m.user.color,
+    emoji: m.user.emoji,
     role: m.role,
   }));
 
@@ -164,8 +166,8 @@ export async function getGroupTimeline(groupId: string) {
       where: { groupId, deletedAt: null },
       orderBy: [{ date: "desc" }, { createdAt: "desc" }],
       include: {
-        payers: { include: { user: { select: { id: true, name: true, color: true } } } },
-        shares: { include: { user: { select: { id: true, name: true, color: true } } } },
+        payers: { include: { user: { select: { id: true, name: true, color: true, emoji: true } } } },
+        shares: { include: { user: { select: { id: true, name: true, color: true, emoji: true } } } },
         _count: { select: { comments: { where: { deletedAt: null } } } },
       },
     }),
@@ -173,8 +175,8 @@ export async function getGroupTimeline(groupId: string) {
       where: { groupId, deletedAt: null },
       orderBy: [{ date: "desc" }, { createdAt: "desc" }],
       include: {
-        from: { select: { id: true, name: true, color: true } },
-        to: { select: { id: true, name: true, color: true } },
+        from: { select: { id: true, name: true, color: true, emoji: true } },
+        to: { select: { id: true, name: true, color: true, emoji: true } },
       },
     }),
   ]);
@@ -193,7 +195,7 @@ export async function getGroupTimeline(groupId: string) {
 }
 
 export type PersonBalance = {
-  user: { id: string; name: string; color: string };
+  user: { id: string; name: string; color: string; emoji: string | null };
   byCurrency: Map<string, bigint>;
 };
 
@@ -208,7 +210,7 @@ export async function getOverallBalances(userId: string) {
       id: true,
       currency: true,
       simplifyDebts: true,
-      members: { select: { user: { select: { id: true, name: true, color: true } } } },
+      members: { select: { user: { select: { id: true, name: true, color: true, emoji: true } } } },
     },
   });
 
@@ -258,7 +260,7 @@ export async function getActivity(userId: string, limit = 60) {
     orderBy: { createdAt: "desc" },
     take: limit,
     include: {
-      actor: { select: { id: true, name: true, color: true } },
+      actor: { select: { id: true, name: true, color: true, emoji: true } },
       group: { select: { id: true, name: true, emoji: true, currency: true } },
     },
   });

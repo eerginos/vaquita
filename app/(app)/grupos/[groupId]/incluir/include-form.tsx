@@ -13,7 +13,7 @@ import { Avatar } from "@/components/avatar";
 import { EmptyState, FormError } from "@/components/form-error";
 import { SubmitButton } from "@/components/submit-button";
 
-type Member = { id: string; name: string; color: string };
+type Member = { id: string; name: string; color: string; emoji: string | null };
 
 export type ClientExpense = {
   id: string;
@@ -145,7 +145,7 @@ export function IncludeForm({
                   onChange={() => toggleMember(m.id)}
                   className="h-4 w-4 shrink-0 accent-[var(--color-brand-600)]"
                 />
-                <Avatar name={m.name} color={m.color} size="sm" />
+                <Avatar name={m.name} color={m.color} emoji={m.emoji} size="sm" />
                 <span className="min-w-0 flex-1 truncate text-sm font-medium">
                   {m.name}
                   {m.id === currentUserId && (
@@ -279,7 +279,7 @@ export function IncludeForm({
                     const after = preview.after.get(m.id) ?? 0n;
                     return (
                       <li key={m.id} className="flex items-center gap-3 px-4 py-2.5">
-                        <Avatar name={m.name} color={m.color} size="xs" />
+                        <Avatar name={m.name} color={m.color} emoji={m.emoji} size="xs" />
                         <span className="min-w-0 flex-1 truncate text-sm">{m.name}</span>
                         {/* Los dos lados van con signo: mostrar el "antes" con signo y el
                             "después" en valor absoluto se lee como si cambiara de sentido. */}

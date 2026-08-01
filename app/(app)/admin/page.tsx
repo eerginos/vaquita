@@ -24,6 +24,7 @@ export default async function AdminPage() {
         name: true,
         email: true,
         color: true,
+        emoji: true,
         isAdmin: true,
         createdAt: true,
         _count: { select: { memberships: true } },
@@ -92,7 +93,7 @@ export default async function AdminPage() {
         <ul className="divide-y">
           {users.map((user) => (
             <li key={user.id} className="flex flex-wrap items-center gap-3 px-5 py-3">
-              <Avatar name={user.name} color={user.color} size="sm" />
+              <Avatar name={user.name} color={user.color} emoji={user.emoji} size="sm" />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">
                   {user.name}

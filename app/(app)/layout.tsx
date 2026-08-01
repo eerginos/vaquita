@@ -29,7 +29,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             </Link>
 
             <Link href="/perfil" className="flex items-center gap-2 rounded-lg p-1 hover:bg-[var(--surface-2)]">
-              <Avatar name={user.name} color={user.color} size="sm" />
+              <Avatar name={user.name} color={user.color} emoji={user.emoji} size="sm" />
               <span className="hidden text-sm font-medium sm:block">{user.name}</span>
             </Link>
 

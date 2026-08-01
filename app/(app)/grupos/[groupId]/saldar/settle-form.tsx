@@ -9,7 +9,7 @@ import { FormError } from "@/components/form-error";
 import { MoneyInput } from "@/components/money-input";
 import { SubmitButton } from "@/components/submit-button";
 
-type Member = { id: string; name: string; color: string };
+type Member = { id: string; name: string; color: string; emoji: string | null };
 
 type Suggestion = {
   fromUserId: string;

@@ -116,22 +116,18 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
           </p>
         ) : (
           <ul className="divide-y">
-            {group.transfers.map((t, i) => (
+            {group.transfers.map((t, i) => {
+              const from = group.members.find((m) => m.id === t.fromUserId);
+              const to = group.members.find((m) => m.id === t.toUserId);
+
+              return (
               <li key={i} className="flex flex-wrap items-center gap-2 px-5 py-3 text-sm">
-                <Avatar
-                  name={nameOf(t.fromUserId)}
-                  color={group.members.find((m) => m.id === t.fromUserId)?.color}
-                  size="xs"
-                />
+                <Avatar name={nameOf(t.fromUserId)} color={from?.color} emoji={from?.emoji} size="xs" />
                 <span className="font-medium">
                   {t.fromUserId === user.id ? "Vos" : nameOf(t.fromUserId)}
                 </span>
                 <span className="text-[var(--text-muted)]">le debe a</span>
-                <Avatar
-                  name={nameOf(t.toUserId)}
-                  color={group.members.find((m) => m.id === t.toUserId)?.color}
-                  size="xs"
-                />
+                <Avatar name={nameOf(t.toUserId)} color={to?.color} emoji={to?.emoji} size="xs" />
                 <span className="font-medium">
                   {t.toUserId === user.id ? "vos" : nameOf(t.toUserId)}
                 </span>
@@ -139,7 +135,8 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
                   {formatMoney(t.amountCents, group.currency)}
                 </span>
               </li>
-            ))}
+              );
+            })}
           </ul>
         )}
 
@@ -150,7 +147,7 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
           <ul className="divide-y border-t">
             {group.members.map((member) => (
               <li key={member.id} className="flex items-center gap-3 px-5 py-2.5">
-                <Avatar name={member.name} color={member.color} size="xs" />
+                <Avatar name={member.name} color={member.color} emoji={member.emoji} size="xs" />
                 <span className="flex-1 truncate text-sm">
                   {member.name}
                   {member.id === user.id && (

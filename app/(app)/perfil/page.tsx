@@ -24,7 +24,7 @@ export default async function ProfilePage() {
   return (
     <div className="mx-auto max-w-lg space-y-6">
       <div className="flex items-center gap-4">
-        <Avatar name={user.name} color={user.color} size="lg" />
+        <Avatar name={user.name} color={user.color} emoji={user.emoji} size="lg" />
         <div className="min-w-0">
           <h1 className="truncate text-xl font-semibold tracking-tight">{user.name}</h1>
           <p className="truncate text-sm text-[var(--text-muted)]">{user.email}</p>
@@ -36,7 +36,7 @@ export default async function ProfilePage() {
 
       <section className="card p-5">
         <h2 className="mb-4 text-sm font-semibold">Datos</h2>
-        <ProfileForm name={user.name} color={user.color} />
+        <ProfileForm name={user.name} color={user.color} emoji={user.emoji} />
       </section>
 
       <section className="card p-5">

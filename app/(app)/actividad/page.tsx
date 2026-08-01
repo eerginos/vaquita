@@ -103,7 +103,7 @@ export default async function ActivityPage() {
                 <div className="min-w-0 flex-1">
                   <p className="text-sm">{body}</p>
                   <p className="mt-0.5 flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
-                    <Avatar name={activity.actor.name} color={activity.actor.color} size="xs" />
+                    <Avatar name={activity.actor.name} color={activity.actor.color} emoji={activity.actor.emoji} size="xs" />
                     {activity.group && (
                       <span>
                         {activity.group.emoji} {activity.group.name} ·

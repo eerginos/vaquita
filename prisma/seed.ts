@@ -11,6 +11,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../lib/generated/prisma/client";
 import { allocateByWeights, splitEvenly } from "../lib/money";
 import { colorForSeed } from "../lib/colors";
+import { emojiForSeed } from "../lib/emojis";
 
 const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
@@ -60,6 +61,7 @@ async function main() {
           passwordHash,
           isAdmin: p.isAdmin,
           color: colorForSeed(p.email),
+          emoji: emojiForSeed(p.email),
         },
       }),
     ),

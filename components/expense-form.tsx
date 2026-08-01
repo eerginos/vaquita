@@ -13,7 +13,7 @@ import { FormError } from "@/components/form-error";
 import { MoneyInput } from "@/components/money-input";
 import { SubmitButton } from "@/components/submit-button";
 
-export type Member = { id: string; name: string; color: string };
+export type Member = { id: string; name: string; color: string; emoji: string | null };
 
 export type ExpenseInitial = {
   id: string;
@@ -285,7 +285,7 @@ export function ExpenseForm({
             <ul className="space-y-2">
               {members.map((m) => (
                 <li key={m.id} className="flex items-center gap-3">
-                  <Avatar name={m.name} color={m.color} size="sm" />
+                  <Avatar name={m.name} color={m.color} emoji={m.emoji} size="sm" />
                   <span className="min-w-0 flex-1 truncate text-sm">{m.name}</span>
                   <MoneyInput
                     name={`payer:${m.id}`}
@@ -354,7 +354,7 @@ export function ExpenseForm({
                   className="h-4 w-4 shrink-0 accent-[var(--color-brand-600)]"
                   aria-label={`Incluir a ${m.name}`}
                 />
-                <Avatar name={m.name} color={m.color} size="sm" />
+                <Avatar name={m.name} color={m.color} emoji={m.emoji} size="sm" />
 
                 <span className="min-w-0 flex-1">
                   <span

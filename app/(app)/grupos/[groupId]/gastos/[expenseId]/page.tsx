@@ -38,19 +38,19 @@ export default async function ExpenseDetailPage({
     where: { id: expenseId },
     include: {
       group: { select: { id: true, name: true, emoji: true, currency: true, archivedAt: true } },
-      createdBy: { select: { id: true, name: true, color: true } },
+      createdBy: { select: { id: true, name: true, color: true, emoji: true } },
       payers: {
         orderBy: { amountCents: "desc" },
-        include: { user: { select: { id: true, name: true, color: true } } },
+        include: { user: { select: { id: true, name: true, color: true, emoji: true } } },
       },
       shares: {
         orderBy: { amountCents: "desc" },
-        include: { user: { select: { id: true, name: true, color: true } } },
+        include: { user: { select: { id: true, name: true, color: true, emoji: true } } },
       },
       comments: {
         where: { deletedAt: null },
         orderBy: { createdAt: "asc" },
-        include: { user: { select: { id: true, name: true, color: true } } },
+        include: { user: { select: { id: true, name: true, color: true, emoji: true } } },
       },
     },
   });
@@ -100,7 +100,7 @@ export default async function ExpenseDetailPage({
             <ul className="space-y-2">
               {expense.payers.map((payer) => (
                 <li key={payer.id} className="flex items-center gap-2.5">
-                  <Avatar name={payer.user.name} color={payer.user.color} size="sm" />
+                  <Avatar name={payer.user.name} color={payer.user.color} emoji={payer.user.emoji} size="sm" />
                   <span className="min-w-0 flex-1 truncate text-sm">
                     {payer.user.id === user.id ? "Vos" : payer.user.name}
                   </span>
@@ -119,7 +119,7 @@ export default async function ExpenseDetailPage({
             <ul className="space-y-2">
               {expense.shares.map((share) => (
                 <li key={share.id} className="flex items-center gap-2.5">
-                  <Avatar name={share.user.name} color={share.user.color} size="sm" />
+                  <Avatar name={share.user.name} color={share.user.color} emoji={share.user.emoji} size="sm" />
                   <span className="min-w-0 flex-1 truncate text-sm">
                     {share.user.id === user.id ? "Vos" : share.user.name}
                     {expense.splitType === "PERCENT" && share.weight !== null && (
@@ -209,7 +209,7 @@ export default async function ExpenseDetailPage({
           <ul className="mb-4 space-y-3">
             {expense.comments.map((comment) => (
               <li key={comment.id} className="flex gap-3">
-                <Avatar name={comment.user.name} color={comment.user.color} size="sm" />
+                <Avatar name={comment.user.name} color={comment.user.color} emoji={comment.user.emoji} size="sm" />
                 <div className="min-w-0 flex-1">
                   <p className="text-sm">
                     <span className="font-medium">{comment.user.name}</span>{" "}

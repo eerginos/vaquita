@@ -10,7 +10,7 @@ import { Avatar } from "@/components/avatar";
 import { FormError } from "@/components/form-error";
 import { SubmitButton } from "@/components/submit-button";
 
-type Person = { id: string; name: string; email: string; color: string };
+type Person = { id: string; name: string; email: string; color: string; emoji: string | null };
 
 const initial: ActionState = {};
 
@@ -96,7 +96,7 @@ export function NewGroupForm({ people }: { people: Person[] }) {
                     value={person.id}
                     className="h-4 w-4 accent-[var(--color-brand-600)]"
                   />
-                  <Avatar name={person.name} color={person.color} size="sm" />
+                  <Avatar name={person.name} color={person.color} emoji={person.emoji} size="sm" />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-medium">{person.name}</span>
                     <span className="block truncate text-xs text-[var(--text-muted)]">

@@ -4,18 +4,28 @@ import { useActionState, useState } from "react";
 import clsx from "clsx";
 
 import { updateProfileAction, type ActionState } from "@/app/actions/auth";
-import { USER_COLORS } from "@/lib/colors";
+import { emojiForSeed, USER_EMOJIS } from "@/lib/emojis";
+import { Avatar } from "@/components/avatar";
 import { FormError, FormSuccess } from "@/components/form-error";
 import { SubmitButton } from "@/components/submit-button";
 
 const initial: ActionState = {};
 
-export function ProfileForm({ name, color }: { name: string; color: string }) {
+export function ProfileForm({
+  name,
+  color,
+  emoji,
+}: {
+  name: string;
+  color: string;
+  emoji: string | null;
+}) {
   const [state, action] = useActionState(updateProfileAction, initial);
-  const [selected, setSelected] = useState(color);
+  const [selected, setSelected] = useState(emoji || emojiForSeed(name));
+  const [currentName, setCurrentName] = useState(name);
 
   return (
-    <form action={action} className="space-y-4">
+    <form action={action} className="space-y-5">
       <FormError message={state.error} />
       <FormSuccess message={state.success} />
 
@@ -23,28 +33,44 @@ export function ProfileForm({ name, color }: { name: string; color: string }) {
         <label className="label" htmlFor="name">
           Nombre
         </label>
-        <input id="name" name="name" required defaultValue={name} className="input" />
+        <input
+          id="name"
+          name="name"
+          required
+          defaultValue={name}
+          onChange={(e) => setCurrentName(e.target.value)}
+          className="input"
+        />
       </div>
 
       <div>
-        <span className="label">Color</span>
-        <input type="hidden" name="color" value={selected} />
-        <div className="flex flex-wrap gap-2">
-          {USER_COLORS.map((c) => (
+        <span className="label">Tu emoji</span>
+        <input type="hidden" name="emoji" value={selected} />
+
+        <div className="mb-3 flex items-center gap-3 rounded-lg border bg-[var(--surface-2)] p-3">
+          <Avatar name={currentName} color={color} emoji={selected} size="lg" />
+          <p className="text-sm text-[var(--text-muted)]">
+            Así te van a ver el resto en los grupos, los gastos y los comentarios.
+          </p>
+        </div>
+
+        <div className="grid max-h-52 grid-cols-8 gap-1 overflow-y-auto rounded-lg border p-2 sm:grid-cols-10">
+          {USER_EMOJIS.map((option) => (
             <button
-              key={c}
+              key={option}
               type="button"
-              onClick={() => setSelected(c)}
-              style={{ backgroundColor: c }}
+              onClick={() => setSelected(option)}
               className={clsx(
-                "h-8 w-8 rounded-full transition",
-                selected === c
-                  ? "ring-2 ring-[var(--text)] ring-offset-2 ring-offset-[var(--surface)]"
-                  : "hover:scale-110",
+                "flex h-9 items-center justify-center rounded-lg border text-lg transition",
+                selected === option
+                  ? "border-brand-500 bg-brand-500/10"
+                  : "border-transparent hover:bg-[var(--surface-2)]",
               )}
-              aria-label={`Color ${c}`}
-              aria-pressed={selected === c}
-            />
+              aria-label={`Elegir ${option}`}
+              aria-pressed={selected === option}
+            >
+              {option}
+            </button>
           ))}
         </div>
       </div>

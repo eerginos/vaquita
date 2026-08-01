@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 
 import { prisma } from "@/lib/db";
@@ -13,7 +13,7 @@ export default async function NewGroupPage() {
   const people = await prisma.user.findMany({
     where: { id: { not: user.id } },
     orderBy: { name: "asc" },
-    select: { id: true, name: true, email: true, color: true },
+    select: { id: true, name: true, email: true, color: true, emoji: true },
   });
 
   return (

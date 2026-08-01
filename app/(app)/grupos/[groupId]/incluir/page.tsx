@@ -74,7 +74,12 @@ export default async function IncludePage({
         groupId={groupId}
         currency={group.currency}
         simplifyDebts={group.simplifyDebts}
-        members={group.members.map((m) => ({ id: m.id, name: m.name, color: m.color }))}
+        members={group.members.map((m) => ({
+          id: m.id,
+          name: m.name,
+          color: m.color,
+          emoji: m.emoji,
+        }))}
         currentUserId={user.id}
         expenses={clientExpenses}
         settlements={settlements.map((s) => ({

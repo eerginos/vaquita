@@ -23,7 +23,7 @@ export default async function NewExpensePage({
     include: {
       members: {
         orderBy: { joinedAt: "asc" },
-        select: { user: { select: { id: true, name: true, color: true } } },
+        select: { user: { select: { id: true, name: true, color: true, emoji: true } } },
       },
     },
   });
