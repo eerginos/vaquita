@@ -3,6 +3,10 @@
 Un Splitwise propio: gastos compartidos entre amigos, gratis y autoalojado.
 Registro cerrado por invitación, sin apps de terceros, sin límites de free tier.
 
+> Este archivo es cómo levantarlo y desplegarlo.
+> [`CONTEXT.md`](CONTEXT.md) explica por qué las cosas son como son y qué se decidió no hacer.
+> [`CLAUDE.md`](CLAUDE.md) es la guía para trabajar en el código.
+
 ## Qué hace
 
 - **Grupos** con moneda propia, ícono y archivado.
@@ -55,7 +59,7 @@ contraseña `split1234`. **Ojo: el seed borra toda la base.**
 | Comando | Qué hace |
 |---|---|
 | `npm run dev` | Servidor de desarrollo |
-| `npm run build` | `prisma generate` + build de producción |
+| `npm run build` | `prisma generate` + build de producción. Es el chequeo de tipos: no hay tests ni linter. |
 | `npm run db:migrate` | Crea una migración nueva a partir del schema |
 | `npm run db:deploy` | Aplica migraciones pendientes (producción) |
 | `npm run db:studio` | Prisma Studio para mirar la base |
