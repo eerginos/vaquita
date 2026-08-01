@@ -28,7 +28,7 @@ export function usesLabel(invite: InviteLike): string {
 
 /** Los links de invitación entran por acá: la página decide según haya sesión o no. */
 export function inviteUrl(appUrl: string, code: string): string {
-  return `${appUrl.replace(/\/$/, "")}/invitacion?code=${code}`;
+  return `${appUrl.replace(/\/$/, "")}/invitacion/${code}`;
 }
 
 /** Días de vigencia. Un link que va a un grupo de WhatsApp dura menos. */

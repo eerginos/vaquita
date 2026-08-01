@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  // Necesario para que las URLs de las imágenes de vista previa salgan
+  // absolutas: WhatsApp no resuelve rutas relativas.
+  metadataBase: new URL(process.env.APP_URL || "http://localhost:3000"),
   title: {
     default: "Split",
     template: "%s · Split",

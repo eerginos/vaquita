@@ -5,12 +5,9 @@ import { getCurrentUser } from "@/lib/auth";
 import { isInviteUsable } from "@/lib/invites";
 
 /**
- * Entrada única de los links de invitación. Resuelve solo, sin pantallas
- * intermedias:
- *
- *   sin sesión           -> a crear la cuenta con el código
- *   ya es del grupo      -> al grupo
- *   tiene cuenta         -> se suma al grupo y entra
+ * Suma al grupo a quien ya tiene cuenta y lo manda adentro, sin pantallas
+ * intermedias. Acá llega redirigido desde /invitacion, que es la página con
+ * la vista previa para WhatsApp.
  *
  * Es un route handler y no una página porque acá se escribe en la base:
  * corre una sola vez por request, a diferencia del render de un componente.
