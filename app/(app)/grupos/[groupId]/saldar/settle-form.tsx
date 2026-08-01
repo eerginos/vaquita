@@ -7,9 +7,16 @@ import { createSettlementAction, type ActionState } from "@/app/actions/settleme
 import { formatMoney, parseAmountToCents } from "@/lib/money";
 import { FormError } from "@/components/form-error";
 import { MoneyInput } from "@/components/money-input";
+import { PayAlias } from "@/components/pay-alias";
 import { SubmitButton } from "@/components/submit-button";
 
-type Member = { id: string; name: string; color: string; emoji: string | null };
+type Member = {
+  id: string;
+  name: string;
+  color: string;
+  emoji: string | null;
+  payAlias: string | null;
+};
 
 type Suggestion = {
   fromUserId: string;
@@ -166,6 +173,15 @@ export function SettleForm({
       {fromUserId === toUserId && (
         <p className="text-xs text-debt-500">Elegí dos personas distintas.</p>
       )}
+
+      {/* Si el que paga sos vos, mostramos dónde transferirle al otro. */}
+      {fromUserId === currentUserId &&
+        (() => {
+          const target = members.find((m) => m.id === toUserId);
+          return target?.payAlias ? (
+            <PayAlias name={target.name} alias={target.payAlias} />
+          ) : null;
+        })()}
 
       <div className="flex gap-2">
         <SubmitButton className="btn-primary flex-1">Registrar pago</SubmitButton>

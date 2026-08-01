@@ -9,6 +9,7 @@ export type MemberLite = {
   email: string;
   color: string;
   emoji: string | null;
+  payAlias: string | null;
   role: "OWNER" | "MEMBER";
 };
 
@@ -123,7 +124,16 @@ export async function getGroupDetail(groupId: string): Promise<GroupDetail | nul
         orderBy: { joinedAt: "asc" },
         select: {
           role: true,
-          user: { select: { id: true, name: true, email: true, color: true, emoji: true } },
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              color: true,
+              emoji: true,
+              payAlias: true,
+            },
+          },
         },
       },
     },
@@ -137,6 +147,7 @@ export async function getGroupDetail(groupId: string): Promise<GroupDetail | nul
     email: m.user.email,
     color: m.user.color,
     emoji: m.user.emoji,
+    payAlias: m.user.payAlias,
     role: m.role,
   }));
 
@@ -252,6 +263,121 @@ export async function getOverallBalances(userId: string) {
   );
 
   return { totals, people };
+}
+
+export type GroupTotals = {
+  /** Suma de todos los gastos del grupo. */
+  totalCents: bigint;
+  /** Lo que consumió cada persona (la suma de sus partes). */
+  costsByUser: Map<string, bigint>;
+};
+
+/**
+ * Cuánto gastó el grupo y cuánto consumió cada uno.
+ * Ojo: esto NO es el saldo. Podés haber consumido mucho y estar en cero
+ * porque pagaste justo lo que te tocaba.
+ */
+export function groupTotals(ledger: GroupLedger): GroupTotals {
+  let totalCents = 0n;
+  const costsByUser = new Map<string, bigint>();
+
+  for (const expense of ledger.expenses) {
+    for (const payer of expense.payers) totalCents += payer.amountCents;
+    for (const share of expense.shares) {
+      costsByUser.set(share.userId, (costsByUser.get(share.userId) ?? 0n) + share.amountCents);
+    }
+  }
+
+  return { totalCents, costsByUser };
+}
+
+export async function getGroupTotals(groupId: string): Promise<GroupTotals> {
+  const ledger = (await loadLedgers([groupId])).get(groupId)!;
+  return groupTotals(ledger);
+}
+
+export type StatsFilters = {
+  from?: Date;
+  to?: Date;
+  userId?: string;
+};
+
+/**
+ * Datos para la pantalla de estadísticas. Si viene `userId`, sólo se cuentan
+ * los gastos donde esa persona participa, y los montos son su parte.
+ */
+export async function getGroupStats(groupId: string, filters: StatsFilters) {
+  const expenses = await prisma.expense.findMany({
+    where: {
+      groupId,
+      deletedAt: null,
+      ...(filters.from || filters.to
+        ? { date: { ...(filters.from && { gte: filters.from }), ...(filters.to && { lte: filters.to }) } }
+        : {}),
+      ...(filters.userId ? { shares: { some: { userId: filters.userId } } } : {}),
+    },
+    select: {
+      id: true,
+      description: true,
+      amountCents: true,
+      category: true,
+      date: true,
+      createdById: true,
+      payers: { select: { userId: true, amountCents: true } },
+      shares: { select: { userId: true, amountCents: true } },
+    },
+    orderBy: { date: "asc" },
+  });
+
+  /** Cuánto cuenta cada gasto: el total, o la parte de la persona filtrada. */
+  const weightOf = (e: (typeof expenses)[number]) =>
+    filters.userId
+      ? (e.shares.find((s) => s.userId === filters.userId)?.amountCents ?? 0n)
+      : e.amountCents;
+
+  let totalCents = 0n;
+  const byCategory = new Map<string, bigint>();
+  const paidByUser = new Map<string, bigint>();
+  const costByUser = new Map<string, bigint>();
+  const countByUser = new Map<string, number>();
+
+  for (const e of expenses) {
+    const weight = weightOf(e);
+    totalCents += weight;
+    byCategory.set(e.category, (byCategory.get(e.category) ?? 0n) + weight);
+    countByUser.set(e.createdById, (countByUser.get(e.createdById) ?? 0) + 1);
+
+    for (const p of e.payers) {
+      paidByUser.set(p.userId, (paidByUser.get(p.userId) ?? 0n) + p.amountCents);
+    }
+    for (const s of e.shares) {
+      costByUser.set(s.userId, (costByUser.get(s.userId) ?? 0n) + s.amountCents);
+    }
+  }
+
+  // Días cubiertos, para el promedio diario. Mínimo 1 para no dividir por cero.
+  const first = filters.from ?? expenses[0]?.date;
+  const last = filters.to ?? expenses[expenses.length - 1]?.date;
+  const days =
+    first && last ? Math.max(1, Math.round((last.getTime() - first.getTime()) / 86_400_000) + 1) : 1;
+
+  const biggest = expenses.reduce<(typeof expenses)[number] | null>(
+    (max, e) => (max === null || weightOf(e) > weightOf(max) ? e : max),
+    null,
+  );
+
+  return {
+    expenseCount: expenses.length,
+    totalCents,
+    days,
+    byCategory: [...byCategory.entries()].sort((a, b) => (b[1] > a[1] ? 1 : -1)),
+    paidByUser,
+    costByUser,
+    countByUser,
+    biggest: biggest ? { description: biggest.description, amountCents: biggest.amountCents, date: biggest.date } : null,
+    firstDate: expenses[0]?.date ?? null,
+    lastDate: expenses[expenses.length - 1]?.date ?? null,
+  };
 }
 
 export async function getActivity(userId: string, limit = 60) {

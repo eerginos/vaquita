@@ -3,13 +3,16 @@ import { notFound } from "next/navigation";
 
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { getGroupDetail, getGroupTimeline } from "@/lib/queries";
+import { getGroupDetail, getGroupTimeline, getGroupTotals } from "@/lib/queries";
 import { formatDate, formatMonthYear, monthKey } from "@/lib/dates";
 import { getCategory } from "@/lib/categories";
 import { formatMoney, formatMoneyAbs } from "@/lib/money";
+import { quickSettleAction } from "@/app/actions/settlements";
 import { Avatar, AvatarStack } from "@/components/avatar";
 import { Balance } from "@/components/money";
 import { EmptyState } from "@/components/form-error";
+import { PayAlias } from "@/components/pay-alias";
+import { SubmitButton } from "@/components/submit-button";
 
 export async function generateMetadata({ params }: { params: Promise<{ groupId: string }> }) {
   const { groupId } = await params;
@@ -25,8 +28,12 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
   if (!group) notFound();
   if (!group.members.some((m) => m.id === user.id)) notFound();
 
-  const timeline = await getGroupTimeline(groupId);
+  const [timeline, totals] = await Promise.all([
+    getGroupTimeline(groupId),
+    getGroupTotals(groupId),
+  ]);
   const myBalance = group.net.get(user.id) ?? 0n;
+  const myCosts = totals.costsByUser.get(user.id) ?? 0n;
   const nameOf = (id: string) => group.members.find((m) => m.id === id)?.name ?? "alguien";
 
   // Agrupo la lista por mes para que se lea como un extracto.
@@ -62,29 +69,56 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
             </div>
           </div>
 
-          <Link
-            href={`/grupos/${groupId}/configuracion`}
-            className="btn-ghost px-2 py-1.5 text-xs"
-            title="Configuración del grupo"
-          >
-            ⚙️ Ajustes
-          </Link>
+          <div className="flex gap-1">
+            <Link
+              href={`/grupos/${groupId}/estadisticas`}
+              className="btn-ghost px-2 py-1.5 text-xs"
+              title="Estadísticas del grupo"
+            >
+              📊 Números
+            </Link>
+            <Link
+              href={`/grupos/${groupId}/configuracion`}
+              className="btn-ghost px-2 py-1.5 text-xs"
+              title="Configuración del grupo"
+            >
+              ⚙️ Ajustes
+            </Link>
+          </div>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t pt-4">
-          <p className="text-sm">
-            {myBalance === 0n ? (
-              <span className="text-[var(--text-muted)]">Estás al día en este grupo.</span>
-            ) : (
-              <>
-                <span className="text-[var(--text-muted)]">
-                  {myBalance > 0n ? "En este grupo te deben " : "En este grupo debés "}
-                </span>
-                <Balance cents={myBalance} currency={group.currency} />
-              </>
-            )}
-          </p>
+        {/* El saldo y lo que gastaste son cosas distintas: podés haber
+            consumido mucho y estar en cero porque pagaste justo tu parte. */}
+        <dl className="mt-4 grid grid-cols-2 gap-3 border-t pt-4 sm:grid-cols-3">
+          <div>
+            <dt className="text-xs text-[var(--text-muted)]">
+              {myBalance === 0n ? "Tu saldo" : myBalance > 0n ? "Te deben" : "Debés"}
+            </dt>
+            <dd className="mt-0.5">
+              {myBalance === 0n ? (
+                <span className="text-sm text-[var(--text-muted)]">estás al día 🎉</span>
+              ) : (
+                <Balance cents={myBalance} currency={group.currency} className="text-lg" />
+              )}
+            </dd>
+          </div>
 
+          <div>
+            <dt className="text-xs text-[var(--text-muted)]">Consumiste vos</dt>
+            <dd className="mt-0.5 text-lg font-semibold tabular-nums">
+              {formatMoney(myCosts, group.currency)}
+            </dd>
+          </div>
+
+          <div className="col-span-2 sm:col-span-1">
+            <dt className="text-xs text-[var(--text-muted)]">Gastó el grupo</dt>
+            <dd className="mt-0.5 text-lg font-semibold tabular-nums text-[var(--text-muted)]">
+              {formatMoney(totals.totalCents, group.currency)}
+            </dd>
+          </div>
+        </dl>
+
+        <div className="mt-4 flex flex-wrap items-center justify-end gap-3 border-t pt-4">
           {!group.archivedAt && (
             <div className="flex gap-2">
               <Link href={`/grupos/${groupId}/saldar`} className="btn-secondary text-sm">
@@ -119,22 +153,47 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
             {group.transfers.map((t, i) => {
               const from = group.members.find((m) => m.id === t.fromUserId);
               const to = group.members.find((m) => m.id === t.toUserId);
+              const iPay = t.fromUserId === user.id;
+              const iCollect = t.toUserId === user.id;
 
               return (
-              <li key={i} className="flex flex-wrap items-center gap-2 px-5 py-3 text-sm">
-                <Avatar name={nameOf(t.fromUserId)} color={from?.color} emoji={from?.emoji} size="xs" />
-                <span className="font-medium">
-                  {t.fromUserId === user.id ? "Vos" : nameOf(t.fromUserId)}
-                </span>
-                <span className="text-[var(--text-muted)]">le debe a</span>
-                <Avatar name={nameOf(t.toUserId)} color={to?.color} emoji={to?.emoji} size="xs" />
-                <span className="font-medium">
-                  {t.toUserId === user.id ? "vos" : nameOf(t.toUserId)}
-                </span>
-                <span className="ml-auto font-semibold tabular-nums">
-                  {formatMoney(t.amountCents, group.currency)}
-                </span>
-              </li>
+                <li key={i} className="space-y-2 px-5 py-3">
+                  <div className="flex flex-wrap items-center gap-2 text-sm">
+                    <Avatar name={nameOf(t.fromUserId)} color={from?.color} emoji={from?.emoji} size="xs" />
+                    <span className="font-medium">{iPay ? "Vos" : nameOf(t.fromUserId)}</span>
+                    <span className="text-[var(--text-muted)]">le debe a</span>
+                    <Avatar name={nameOf(t.toUserId)} color={to?.color} emoji={to?.emoji} size="xs" />
+                    <span className="font-medium">{iCollect ? "vos" : nameOf(t.toUserId)}</span>
+                    <span className="ml-auto font-semibold tabular-nums">
+                      {formatMoney(t.amountCents, group.currency)}
+                    </span>
+                  </div>
+
+                  {/* El alias se le muestra sólo a quien tiene que transferir. */}
+                  {iPay && to?.payAlias && (
+                    <PayAlias name={to.name} alias={to.payAlias} />
+                  )}
+
+                  {!group.archivedAt && (iPay || iCollect) && (
+                    <form action={quickSettleAction} className="flex justify-end">
+                      <input type="hidden" name="groupId" value={groupId} />
+                      <input type="hidden" name="fromUserId" value={t.fromUserId} />
+                      <input type="hidden" name="toUserId" value={t.toUserId} />
+                      <input type="hidden" name="amountCents" value={t.amountCents.toString()} />
+                      <SubmitButton
+                        className="btn-secondary px-2.5 py-1 text-xs"
+                        pendingLabel="Registrando…"
+                        confirm={
+                          iPay
+                            ? `¿Registrar que le pagaste ${formatMoney(t.amountCents, group.currency)} a ${nameOf(t.toUserId)}?`
+                            : `¿Registrar que ${nameOf(t.fromUserId)} te pagó ${formatMoney(t.amountCents, group.currency)}?`
+                        }
+                      >
+                        {iPay ? "✓ Ya le pagué" : "✓ Ya me pagó"}
+                      </SubmitButton>
+                    </form>
+                  )}
+                </li>
               );
             })}
           </ul>

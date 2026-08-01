@@ -17,6 +17,7 @@ export type CurrentUser = {
   name: string;
   color: string;
   emoji: string | null;
+  payAlias: string | null;
   isAdmin: boolean;
 };
 
@@ -92,6 +93,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     name: user.name,
     color: user.color,
     emoji: user.emoji,
+    payAlias: user.payAlias,
     isAdmin: user.isAdmin,
   };
 });

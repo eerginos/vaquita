@@ -36,7 +36,12 @@ export default async function ProfilePage() {
 
       <section className="card p-5">
         <h2 className="mb-4 text-sm font-semibold">Datos</h2>
-        <ProfileForm name={user.name} color={user.color} emoji={user.emoji} />
+        <ProfileForm
+          name={user.name}
+          color={user.color}
+          emoji={user.emoji}
+          payAlias={user.payAlias}
+        />
       </section>
 
       <section className="card p-5">

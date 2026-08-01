@@ -15,10 +15,12 @@ export function ProfileForm({
   name,
   color,
   emoji,
+  payAlias,
 }: {
   name: string;
   color: string;
   emoji: string | null;
+  payAlias: string | null;
 }) {
   const [state, action] = useActionState(updateProfileAction, initial);
   const [selected, setSelected] = useState(emoji || emojiForSeed(name));
@@ -41,6 +43,25 @@ export function ProfileForm({
           onChange={(e) => setCurrentName(e.target.value)}
           className="input"
         />
+      </div>
+
+      <div>
+        <label className="label" htmlFor="payAlias">
+          Dónde te transfieren{" "}
+          <span className="font-normal text-[var(--text-muted)]">(opcional)</span>
+        </label>
+        <input
+          id="payAlias"
+          name="payAlias"
+          defaultValue={payAlias ?? ""}
+          maxLength={120}
+          className="input"
+          placeholder="emiliano.mp, CBU, o link de Mercado Pago"
+        />
+        <p className="hint mt-1">
+          Se le muestra sólo a quien te tenga que pagar, para que no tenga que pedírtelo. Lo pueden
+          copiar de un click.
+        </p>
       </div>
 
       <div>

@@ -20,11 +20,16 @@ const prisma = new PrismaClient({
 const PASSWORD = "split1234";
 
 const PEOPLE = [
-  { name: "Emiliano", email: process.env.BOOTSTRAP_ADMIN_EMAIL || "emi@ejemplo.com", isAdmin: true },
-  { name: "Sofía Ruiz", email: "sofia@ejemplo.com", isAdmin: false },
-  { name: "Martín Paz", email: "martin@ejemplo.com", isAdmin: false },
-  { name: "Lucía Fernández", email: "lucia@ejemplo.com", isAdmin: false },
-  { name: "Nico Álvarez", email: "nico@ejemplo.com", isAdmin: false },
+  {
+    name: "Emiliano",
+    email: process.env.BOOTSTRAP_ADMIN_EMAIL || "emi@ejemplo.com",
+    isAdmin: true,
+    payAlias: "emiliano.split.mp",
+  },
+  { name: "Sofía Ruiz", email: "sofia@ejemplo.com", isAdmin: false, payAlias: "sofiaruiz.mp" },
+  { name: "Martín Paz", email: "martin@ejemplo.com", isAdmin: false, payAlias: "0000003100010000000001" },
+  { name: "Lucía Fernández", email: "lucia@ejemplo.com", isAdmin: false, payAlias: "luchi.fernandez" },
+  { name: "Nico Álvarez", email: "nico@ejemplo.com", isAdmin: false, payAlias: null },
 ];
 
 function daysAgo(n: number): Date {
@@ -62,6 +67,7 @@ async function main() {
           isAdmin: p.isAdmin,
           color: colorForSeed(p.email),
           emoji: emojiForSeed(p.email),
+          payAlias: p.payAlias,
         },
       }),
     ),

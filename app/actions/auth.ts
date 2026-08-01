@@ -133,11 +133,12 @@ export async function updateProfileAction(
   const user = await requireUser();
   const name = text(formData, "name");
   const emoji = text(formData, "emoji");
+  const payAlias = text(formData, "payAlias").slice(0, 120) || null;
 
   if (name.length < 2) return { error: "El nombre necesita al menos 2 caracteres." };
   if (!isValidUserEmoji(emoji)) return { error: "Ese emoji no está en la paleta." };
 
-  await prisma.user.update({ where: { id: user.id }, data: { name, emoji } });
+  await prisma.user.update({ where: { id: user.id }, data: { name, emoji, payAlias } });
   revalidatePath("/", "layout");
 
   return { success: "Perfil actualizado." };
