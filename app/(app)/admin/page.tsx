@@ -3,15 +3,16 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { getTimezone } from "@/lib/settings";
+import { TIMEZONE_OPTIONS, timezoneOffsetLabel } from "@/lib/timezones";
 import { formatInTimeZone } from "date-fns-tz";
 import { es } from "date-fns/locale";
 import { revokeInviteAction } from "@/app/actions/groups";
-import { toggleAdminAction } from "@/app/actions/admin";
 import { formatDate, formatRelative } from "@/lib/dates";
 import { inviteUrl, isInviteUsable, usesLabel } from "@/lib/invites";
 import { Avatar } from "@/components/avatar";
 import { SubmitButton } from "@/components/submit-button";
 import { CopyField } from "@/components/copy-field";
+import { AdminToggle } from "./admin-toggle";
 import { InviteForm } from "./invite-form";
 import { TimezoneForm } from "./timezone-form";
 import { ResetPasswordForm } from "./reset-password-form";
@@ -21,6 +22,16 @@ export const metadata: Metadata = { title: "Administración" };
 export default async function AdminPage() {
   const me = await requireAdmin();
   const tz = await getTimezone();
+
+  // El desfasaje se calcula acá y no en el cliente: Node y el navegador lo
+  // escriben distinto para algunas zonas y romperían la hidratación.
+  const zoneGroups = TIMEZONE_OPTIONS.map((group) => ({
+    group: group.group,
+    zones: group.zones.map((zone) => ({
+      id: zone.id,
+      label: `${zone.label} (${timezoneOffsetLabel(zone.id)})`,
+    })),
+  }));
 
   const [users, allInvites] = await Promise.all([
     prisma.user.findMany({
@@ -69,6 +80,7 @@ export default async function AdminPage() {
         <TimezoneForm
           current={tz}
           sample={formatInTimeZone(new Date(), tz, "EEEE d 'de' MMMM, HH:mm", { locale: es })}
+          groups={zoneGroups}
         />
       </section>
 
@@ -132,12 +144,7 @@ export default async function AdminPage() {
               </div>
 
               {user.id !== me.id && (
-                <form action={toggleAdminAction}>
-                  <input type="hidden" name="userId" value={user.id} />
-                  <SubmitButton className="btn-ghost px-2 py-1 text-xs" pendingLabel="…">
-                    {user.isAdmin ? "Quitar admin" : "Hacer admin"}
-                  </SubmitButton>
-                </form>
+                <AdminToggle userId={user.id} name={user.name} isAdmin={user.isAdmin} />
               )}
             </li>
           ))}

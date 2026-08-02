@@ -3,13 +3,30 @@
 import { useActionState, useState } from "react";
 
 import { updateTimezoneAction, type AdminState } from "@/app/actions/admin";
-import { TIMEZONE_OPTIONS, timezoneOffsetLabel } from "@/lib/timezones";
 import { FormError, FormSuccess } from "@/components/form-error";
 import { SubmitButton } from "@/components/submit-button";
 
+export type ZoneGroup = {
+  group: string;
+  zones: { id: string; label: string }[];
+};
+
 const initial: AdminState = {};
 
-export function TimezoneForm({ current, sample }: { current: string; sample: string }) {
+export function TimezoneForm({
+  current,
+  sample,
+  groups,
+}: {
+  current: string;
+  sample: string;
+  /**
+   * Vienen ya armadas desde el servidor, con el desfasaje incluido en la
+   * etiqueta. Calcularlo acá daría distinto en Node y en el navegador
+   * ("GMT" contra "GMT+0" para UTC) y rompería la hidratación.
+   */
+  groups: ZoneGroup[];
+}) {
   const [state, action] = useActionState(updateTimezoneAction, initial);
   const [selected, setSelected] = useState(current);
 
@@ -25,11 +42,11 @@ export function TimezoneForm({ current, sample }: { current: string; sample: str
           onChange={(e) => setSelected(e.target.value)}
           className="input"
         >
-          {TIMEZONE_OPTIONS.map((group) => (
+          {groups.map((group) => (
             <optgroup key={group.group} label={group.group}>
               {group.zones.map((zone) => (
                 <option key={zone.id} value={zone.id}>
-                  {zone.label} ({timezoneOffsetLabel(zone.id)})
+                  {zone.label}
                 </option>
               ))}
             </optgroup>
