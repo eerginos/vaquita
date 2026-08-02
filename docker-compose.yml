@@ -1,28 +1,43 @@
-# Para desarrollo local: levanta sólo Postgres.
-#   docker compose up -d
-# La app se corre aparte con `npm run dev`.
+# Stack completo: la app y su base de datos.
 #
-# En producción no se usa este archivo: Coolify construye el Dockerfile
-# y le inyecta DATABASE_URL apuntando a su propio Postgres.
+#   cp .env.example .env   (y editalo)
+#   docker compose up -d
+#
+# Las migraciones se aplican solas al arrancar el contenedor.
 
 services:
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Se arma acá a partir de las POSTGRES_* para no repetir la contraseña
+      # en dos lugares. Pisa el DATABASE_URL del .env, que es el de desarrollo.
+      DATABASE_URL: postgresql://${POSTGRES_USER:-vaquita}:${POSTGRES_PASSWORD:?falta POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-vaquita}?schema=public
+      AUTH_SECRET: ${AUTH_SECRET:?falta AUTH_SECRET}
+      APP_URL: ${APP_URL:?falta APP_URL}
+      BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:?falta BOOTSTRAP_ADMIN_EMAIL}
+      TZ: ${TZ:-America/Argentina/Buenos_Aires}
+    ports:
+      - "${APP_PORT:-3000}:3000"
+
   db:
     image: postgres:17-alpine
-    container_name: split-db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: split
-      POSTGRES_PASSWORD: split
-      POSTGRES_DB: split
-    ports:
-      - "5433:5432"
+      POSTGRES_USER: ${POSTGRES_USER:-vaquita}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?falta POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-vaquita}
+      TZ: ${TZ:-America/Argentina/Buenos_Aires}
     volumes:
-      - split-db-data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U split"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vaquita}"]
       interval: 10s
       timeout: 5s
       retries: 5
 
 volumes:
-  split-db-data:
+  db-data:

@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title,
       description: inviteSubline(invitation.group?.name ?? null),
-      siteName: "Split",
+      siteName: "Vaquita",
       locale: "es_AR",
       type: "website",
     },
@@ -75,7 +75,7 @@ export default async function InvitePage({ params }: Props) {
       <div className="w-full max-w-sm space-y-6">
         <div className="flex flex-col items-center gap-3">
           <Logo size={56} className="rounded-2xl shadow-lg shadow-brand-600/20" />
-          <h1 className="text-2xl font-semibold tracking-tight">Split</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Vaquita</h1>
         </div>
 
         <div className="card space-y-4 p-6 text-center">

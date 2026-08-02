@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Necesario para la imagen Docker que despliega Coolify: Next copia
-  // sólo las dependencias que realmente usa a .next/standalone.
+  // Necesario para la imagen Docker: Next copia a .next/standalone sólo
+  // las dependencias que realmente usa.
   output: "standalone",
   poweredByHeader: false,
   serverExternalPackages: ["@prisma/adapter-pg", "pg"],

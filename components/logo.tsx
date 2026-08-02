@@ -14,7 +14,7 @@ export function Logo({ size = 32, className }: { size?: number; className?: stri
       viewBox="0 0 64 64"
       className={className}
       role="img"
-      aria-label="Split"
+      aria-label="Vaquita"
     >
       <rect width="64" height="64" rx="15" fill="#128268" />
       <circle cx="32" cy="32" r="20" fill="#ffffff" />

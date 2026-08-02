@@ -79,6 +79,8 @@ No están descartadas para siempre; se dejaron afuera con una razón.
   (nombre y email). Es necesario para poder invitar, pero es data que se comparte entre todos los
   que usan la app.
 - **Sin backups automáticos de la base.** Hoy depende de lo que haga Coolify por su lado.
+- **El repo se llama `erginos-split` y la app se llama Vaquita.** Se renombró la app pero no el
+  repositorio, para no tocar la conexión que Coolify ya tiene con GitHub.
 
 ## Historia
 

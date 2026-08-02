@@ -3,8 +3,8 @@ import type { MetadataRoute } from "next";
 /** Para cuando la agregan a la pantalla de inicio del celular. */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Split — gastos compartidos",
-    short_name: "Split",
+    name: "Vaquita — gastos compartidos",
+    short_name: "Vaquita",
     description: "Gastos compartidos entre amigos, sin vueltas.",
     start_url: "/",
     display: "standalone",

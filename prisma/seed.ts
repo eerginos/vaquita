@@ -17,7 +17,7 @@ const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
 });
 
-const PASSWORD = "split1234";
+const PASSWORD = "vaquita1234";
 
 const PEOPLE = [
   {

@@ -1,4 +1,4 @@
-// Modelo de datos de erginos-split.
+// Modelo de datos de Vaquita.
 //
 // Convención de dinero: TODOS los importes se guardan como enteros en la
 // unidad mínima de la moneda (centavos) usando BigInt. Nunca floats.

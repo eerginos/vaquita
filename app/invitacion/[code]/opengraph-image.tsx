@@ -30,11 +30,20 @@ export default async function Image({ params }: { params: Promise<{ code: string
         invitation.group?.name ?? null,
         invitation.maxUses === null,
       )
-    : "Split";
+    : "Vaquita";
 
   const subline = valid
     ? "Dividan los gastos sin que nadie lleve la cuenta."
     : "Gastos compartidos, sin vueltas.";
+
+  // El dominio sale de la configuración: cada instalación muestra el suyo.
+  const host = (() => {
+    try {
+      return new URL(process.env.APP_URL ?? "").host;
+    } catch {
+      return "";
+    }
+  })();
 
   return new ImageResponse(
     (
@@ -76,7 +85,7 @@ export default async function Image({ params }: { params: Promise<{ code: string
             />
           </div>
           <div style={{ display: "flex", fontSize: "44px", color: "#ffffff", fontWeight: 700 }}>
-            Split
+            Vaquita
           </div>
         </div>
 
@@ -98,7 +107,7 @@ export default async function Image({ params }: { params: Promise<{ code: string
         </div>
 
         <div style={{ display: "flex", fontSize: "26px", color: "rgba(255,255,255,0.7)" }}>
-          split.erginos.com.ar
+          {host}
         </div>
       </div>
     ),

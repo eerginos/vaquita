@@ -6,8 +6,8 @@ export const metadata: Metadata = {
   // absolutas: WhatsApp no resuelve rutas relativas.
   metadataBase: new URL(process.env.APP_URL || "http://localhost:3000"),
   title: {
-    default: "Split",
-    template: "%s · Split",
+    default: "Vaquita",
+    template: "%s · Vaquita",
   },
   description: "Gastos compartidos entre amigos, sin vueltas.",
   robots: { index: false, follow: false },

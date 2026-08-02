@@ -1,6 +1,8 @@
-# Split
+# Vaquita
 
-Un Splitwise propio: gastos compartidos entre amigos, gratis y autoalojado.
+Gastos compartidos entre amigos, autoalojado. Como hacer una vaquita, pero sin
+que nadie tenga que llevar la cuenta en una servilleta.
+
 Registro cerrado por invitación, sin apps de terceros, sin límites de free tier.
 
 > Este archivo es cómo levantarlo y desplegarlo.
@@ -18,7 +20,8 @@ Registro cerrado por invitación, sin apps de terceros, sin límites de free tie
   sugiere A→C directo.
 - **Pagos** (settlements) para saldar cuentas, con sugerencias precargadas.
 - **Comentarios** en cada gasto y **feed de actividad** por grupo.
-- **Invitaciones** por link de un solo uso, con o sin grupo asociado.
+- **Invitaciones** por link: de un solo uso, o ilimitado para mandar al grupo de
+  WhatsApp, con vista previa al compartirlo.
 - Modo claro y oscuro automático, responsive.
 
 ## Stack
@@ -43,7 +46,7 @@ da siempre exactamente el total del gasto — no se pierde ni se inventa un cent
 ```bash
 npm install
 cp .env.example .env          # editá los valores
-docker compose up -d          # Postgres en el puerto 5433
+docker compose -f docker-compose.dev.yml up -d   # Postgres en el 5433
 npx prisma migrate deploy     # crea las tablas
 npm run db:seed               # datos de ejemplo (opcional)
 npm run dev
@@ -52,7 +55,7 @@ npm run dev
 Abrí http://localhost:3000.
 
 Si corriste el seed, entrás con el email de `BOOTSTRAP_ADMIN_EMAIL` y la
-contraseña `split1234`. **Ojo: el seed borra toda la base.**
+contraseña `vaquita1234`. **Ojo: el seed borra toda la base.**
 
 ### Scripts
 
@@ -64,6 +67,16 @@ contraseña `split1234`. **Ojo: el seed borra toda la base.**
 | `npm run db:deploy` | Aplica migraciones pendientes (producción) |
 | `npm run db:studio` | Prisma Studio para mirar la base |
 | `npm run db:seed` | Carga datos de ejemplo (destructivo) |
+
+## Deploy con Docker Compose
+
+```bash
+cp .env.example .env    # completá AUTH_SECRET, APP_URL, POSTGRES_PASSWORD…
+docker compose up -d
+```
+
+Levanta la app y su base. Las migraciones se aplican solas al arrancar. Poné un
+reverse proxy adelante (Caddy, nginx, Traefik) para el dominio y el certificado.
 
 ## Deploy en Coolify
 
@@ -85,11 +98,10 @@ contraseña `split1234`. **Ojo: el seed borra toda la base.**
    | `APP_URL` | `https://split.erginos.com.ar` |
    | `BOOTSTRAP_ADMIN_EMAIL` | Tu email |
 
-   La zona horaria ya viene fijada en el Dockerfile
-   (`TZ=America/Argentina/Buenos_Aires`). Las fechas se formatean en el
-   servidor, así que sin eso el contenedor correría en UTC y un gasto cargado
-   después de las 21:00 quedaría con la fecha del día siguiente. Si algún día
-   lo usás desde otro país, cambiá esa línea del Dockerfile.
+   `TZ` es opcional: el Dockerfile ya trae `America/Argentina/Buenos_Aires`.
+   Las fechas se formatean en el servidor, así que sin zona horaria el
+   contenedor correría en UTC y un gasto cargado de noche quedaría con la fecha
+   del día siguiente. Desde otro país, pasá `TZ` con tu zona.
 
 4. **Dominio**: poné `https://split.erginos.com.ar`. Coolify saca el
    certificado con Let's Encrypt solo.

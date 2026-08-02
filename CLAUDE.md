@@ -4,14 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Qué es
 
-Split: un clon de Splitwise autoalojado, privado, para un grupo de amigos en Argentina.
+Vaquita: un clon de Splitwise autoalojado, privado, para un grupo de amigos en Argentina.
 Web solamente (responsive, sin app nativa). Registro cerrado por invitación.
 La UI, las rutas y los comentarios del código están **en español rioplatense** — mantené ese registro.
 
 ## Comandos
 
 ```bash
-docker compose up -d          # Postgres local en el puerto 5433 (el 5432 suele estar ocupado)
+docker compose -f docker-compose.dev.yml up -d   # Postgres local en el 5433
+                              # (docker-compose.yml es el stack completo, para desplegar)
 npm run dev                   # servidor de desarrollo
 npm run build                 # prisma generate + next build. Es el chequeo de tipos del proyecto.
 npm run db:migrate            # crear y aplicar una migración a partir del schema
@@ -26,7 +27,7 @@ dar por terminado un cambio.
 
 Para verificar comportamiento, levantá la app y probá el flujo real. El seed deja tres grupos con
 gastos, pagos y comentarios; se entra con el email de `BOOTSTRAP_ADMIN_EMAIL` y la contraseña
-`split1234`.
+`vaquita1234`.
 
 ## Reglas del dominio
 
@@ -88,12 +89,13 @@ Cosas que ya costaron tiempo y conviene no volver a descubrir:
 - **Nada de `window.confirm`.** Los navegadores embebidos lo descartan solo y eso cuenta como
   cancelar, así que el botón queda mudo. Usá la prop `confirm` de `SubmitButton`, que arma la
   pregunta en línea.
-- **En route handlers, devolvé `Location` relativo.** Detrás del proxy de Coolify la URL del
+- **En route handlers, devolvé `Location` relativo.** Detrás de un reverse proxy la URL del
   request es la interna del contenedor (`0.0.0.0:3000`); armar una URL absoluta con ella manda al
   navegador a una dirección inexistente.
 - **La imagen de vista previa no renderiza emojis** (el generador de Next no trae fuente de emoji):
   se dibujan como cuadraditos. Usá formas y texto.
-- **`TZ=America/Argentina/Buenos_Aires` está fijado en el Dockerfile.** Las fechas se formatean en
+- **`TZ` viene con `America/Argentina/Buenos_Aires` por defecto en el Dockerfile**, y se puede
+  pisar con la variable de entorno. Las fechas se formatean en
   el servidor; sin eso el contenedor corre en UTC y un gasto cargado después de las 21:00 aparece
   con la fecha del día siguiente. Las fechas por defecto de los formularios se calculan en el
   servidor y se pasan por prop, para que no difieran entre SSR e hidratación.

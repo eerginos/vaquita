@@ -15,7 +15,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4">
           <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
 <Logo size={32} className="rounded-lg" />
-            Split
+            Vaquita
           </Link>
 
           <div className="flex items-center gap-3">

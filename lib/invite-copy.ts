@@ -10,7 +10,7 @@ export function inviteHeadline(
 ): string {
   // Un link para varios se manda a un grupo: habla de "ustedes", no de "vos".
   const verbo = multiUse ? "los invitó" : "te invitó";
-  return groupName ? `${inviterName} ${verbo} a ${groupName}` : `${inviterName} ${verbo} a Split`;
+  return groupName ? `${inviterName} ${verbo} a ${groupName}` : `${inviterName} ${verbo} a Vaquita`;
 }
 
 export function inviteSubline(groupName: string | null): string {

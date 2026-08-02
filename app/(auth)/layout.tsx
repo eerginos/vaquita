@@ -11,7 +11,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
         <div className="mb-8 flex flex-col items-center gap-3">
 <Logo size={56} className="rounded-2xl shadow-lg shadow-brand-600/20" />
           <div className="text-center">
-            <h1 className="text-2xl font-semibold tracking-tight">Split</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Vaquita</h1>
             <p className="text-sm text-[var(--text-muted)]">Gastos compartidos, sin vueltas.</p>
           </div>
         </div>
