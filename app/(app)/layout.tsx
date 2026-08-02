@@ -3,7 +3,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { Avatar } from "@/components/avatar";
 import { BottomNav, SidebarNav } from "@/components/nav";
-import { Logo } from "@/components/logo";
+import { VaquitaCabeza, VaquitaTexto } from "@/components/logo";
 import { signOutAction } from "@/app/actions/auth";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -12,16 +12,24 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className="min-h-dvh">
       <header className="sticky top-0 z-30 border-b bg-[var(--surface)]/90 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4">
-          <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
-<Logo size={32} className="rounded-lg" />
-            Vaquita
+        <div className="relative mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4">
+          {/* La vaca arranca en el borde de arriba y cuelga por debajo de la
+              barra. El nombre va corrido a la derecha para dejarle el lugar. */}
+          <Link href="/" className="flex items-center" title="Vaquita">
+            <VaquitaCabeza
+              size={84}
+              className="pointer-events-none absolute left-2 top-[3px] z-20 drop-shadow-[0_5px_9px_rgba(0,0,0,.35)] sm:left-3"
+            />
+            <span className="ml-[74px] sm:ml-[86px]">
+              <VaquitaTexto height={24} className="sm:hidden" />
+              <VaquitaTexto height={28} className="hidden sm:block" />
+            </span>
           </Link>
 
           <div className="flex items-center gap-3">
             <Link
               href="/grupos/nuevo"
-              className="btn-primary hidden text-xs sm:inline-flex"
+              className="btn-secondary hidden text-xs sm:inline-flex"
               title="Crear un grupo nuevo"
             >
               + Nuevo grupo
@@ -45,7 +53,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-6xl gap-8 px-4 py-6 pb-24 md:pb-8">
+      <div className="mx-auto flex max-w-6xl gap-8 px-4 pb-24 pt-10 md:pb-8 md:pt-8">
         <aside className="hidden w-52 shrink-0 md:block">
           <div className="sticky top-20">
             <SidebarNav isAdmin={user.isAdmin} />

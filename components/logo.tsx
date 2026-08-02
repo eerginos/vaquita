@@ -1,24 +1,57 @@
 /**
- * Marca de Split: un círculo partido en dos mitades que no son iguales.
- * El corte va desplazado del centro a propósito — dividir en partes iguales
- * es sólo una de las formas de dividir.
+ * La marca de Vaquita. Los archivos salen de `brand/` y las versiones que se
+ * sirven se regeneran con `npm run marca`.
  *
- * Si cambia acá, hay que cambiar también app/icon.svg, que es el mismo dibujo
- * como archivo estático para el favicon.
+ * La vaca de la barra arranca pegada al borde de arriba y sobresale sólo hacia
+ * abajo: la barra está fija en el tope de la pantalla, así que todo lo que
+ * suba por encima se recorta.
  */
-export function Logo({ size = 32, className }: { size?: number; className?: string }) {
+
+/** Cabeza sola. En la barra cuelga por debajo del borde. */
+export function VaquitaCabeza({
+  size = 84,
+  className,
+}: {
+  size?: number;
+  className?: string;
+}) {
   return (
-    <svg
+    <img
+      src="/marca/cabeza.webp"
+      alt=""
+      aria-hidden
       width={size}
-      height={size}
-      viewBox="0 0 64 64"
+      height={Math.round((size * 520) / 536)}
       className={className}
-      role="img"
-      aria-label="Vaquita"
-    >
-      <rect width="64" height="64" rx="15" fill="#128268" />
-      <circle cx="32" cy="32" r="20" fill="#ffffff" />
-      <rect x="24" y="-6" width="6" height="76" fill="#128268" transform="rotate(-15 32 32)" />
-    </svg>
+      style={{ height: size, width: "auto" }}
+    />
+  );
+}
+
+/** La vaca entera, para las pantallas de marca. */
+export function VaquitaEntera({ size = 160, className }: { size?: number; className?: string }) {
+  return (
+    <img
+      src="/marca/vaca.webp"
+      alt="Vaquita"
+      width={size}
+      height={Math.round((size * 682) / 517)}
+      className={className}
+      style={{ width: size, height: "auto" }}
+    />
+  );
+}
+
+/** El nombre dibujado. Se usa en vez de texto donde entra cómodo. */
+export function VaquitaTexto({ height = 26, className }: { height?: number; className?: string }) {
+  return (
+    <img
+      src="/marca/texto.webp"
+      alt="Vaquita"
+      height={height}
+      width={Math.round((height * 843) / 275)}
+      className={className}
+      style={{ height, width: "auto" }}
+    />
   );
 }

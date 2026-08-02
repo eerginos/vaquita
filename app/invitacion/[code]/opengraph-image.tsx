@@ -1,18 +1,21 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+
 import { ImageResponse } from "next/og";
 
 import { prisma } from "@/lib/db";
 import { isInviteUsable } from "@/lib/invites";
 import { inviteHeadline } from "@/lib/invite-copy";
 
-export const alt = "Invitación a un grupo de Split";
+export const alt = "Invitación a un grupo de Vaquita";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 /**
  * La imagen que muestra WhatsApp al pegar el link.
  *
- * Se dibuja todo con divs y no con SVG ni emojis: el renderer de Next no
- * trae fuente de emoji y los dibujaría como cuadraditos.
+ * La vaca va embebida como data URI: el renderer corre aislado y no resuelve
+ * rutas del sitio. Sin emojis, que se dibujarían como cuadraditos.
  */
 export default async function Image({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
@@ -35,6 +38,12 @@ export default async function Image({ params }: { params: Promise<{ code: string
   const subline = valid
     ? "Dividan los gastos sin que nadie lleve la cuenta."
     : "Gastos compartidos, sin vueltas.";
+
+  // El renderer no puede pedirle archivos al servidor: la imagen se lee del
+  // disco y se le pasa embebida.
+  const vaca = await readFile(join(process.cwd(), "public", "marca", "cabeza-og.png"))
+    .then((b) => `data:image/png;base64,${b.toString("base64")}`)
+    .catch(() => null);
 
   // El dominio sale de la configuración: cada instalación muestra el suyo.
   const host = (() => {
@@ -59,32 +68,12 @@ export default async function Image({ params }: { params: Promise<{ code: string
           fontFamily: "sans-serif",
         }}
       >
-        {/* La marca: círculo blanco con el corte corrido del centro. */}
-        <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
-          <div style={{ display: "flex", position: "relative", width: "96px", height: "96px" }}>
-            <div
-              style={{
-                display: "flex",
-                width: "96px",
-                height: "96px",
-                borderRadius: "48px",
-                background: "#ffffff",
-              }}
-            />
-            <div
-              style={{
-                display: "flex",
-                position: "absolute",
-                left: "34px",
-                top: "-16px",
-                width: "15px",
-                height: "128px",
-                background: "#128268",
-                transform: "rotate(-15deg)",
-              }}
-            />
-          </div>
-          <div style={{ display: "flex", fontSize: "44px", color: "#ffffff", fontWeight: 700 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+          {vaca ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={vaca} width={130} height={129} alt="" />
+          ) : null}
+          <div style={{ display: "flex", fontSize: "48px", color: "#ffffff", fontWeight: 700 }}>
             Vaquita
           </div>
         </div>

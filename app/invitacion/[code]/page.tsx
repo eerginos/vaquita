@@ -7,7 +7,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { isInviteUsable } from "@/lib/invites";
 import { inviteHeadline, inviteSubline } from "@/lib/invite-copy";
 import { Avatar } from "@/components/avatar";
-import { Logo } from "@/components/logo";
+import { VaquitaEntera, VaquitaTexto } from "@/components/logo";
 
 type Props = { params: Promise<{ code: string }> };
 
@@ -74,8 +74,8 @@ export default async function InvitePage({ params }: Props) {
     <main className="flex min-h-dvh flex-col items-center justify-center px-4 py-10">
       <div className="w-full max-w-sm space-y-6">
         <div className="flex flex-col items-center gap-3">
-          <Logo size={56} className="rounded-2xl shadow-lg shadow-brand-600/20" />
-          <h1 className="text-2xl font-semibold tracking-tight">Vaquita</h1>
+          <VaquitaEntera size={130} />
+          <VaquitaTexto height={34} className="-mt-2" />
         </div>
 
         <div className="card space-y-4 p-6 text-center">

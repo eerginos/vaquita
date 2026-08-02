@@ -21,6 +21,7 @@ npm run db:migrate            # crear y aplicar una migración a partir del sche
 npm run db:deploy             # aplicar migraciones pendientes (lo que corre el contenedor al arrancar)
 npm run db:studio             # explorar la base
 npm run db:seed               # datos de ejemplo — BORRA TODA LA BASE antes de cargar
+npm run marca                 # regenera los archivos de marca desde brand/
 ```
 
 No hay tests ni linter configurados. **`npm run build` es la única verificación automática**:
@@ -104,6 +105,18 @@ Cosas que ya costaron tiempo y conviene no volver a descubrir:
   hidratación. Las fechas de formulario se guardan al mediodía de la zona elegida: la medianoche
   puede correrse de día en el salto de horario de verano.
 - **El seed es destructivo.** Nunca contra producción.
+
+## Marca
+
+Los originales de la vaca viven en `brand/` y **no se sirven**: de ahí se derivan con
+`npm run marca` las versiones de `public/marca/` (WebP para pantalla), los íconos y el PNG que usa
+la imagen de vista previa. Si cambia un original, hay que correr ese script.
+
+En la barra, la vaca arranca pegada al borde de arriba y sobresale **sólo hacia abajo**: la barra
+está fija en el tope de la ventana, así que todo lo que suba por encima se recorta.
+
+La imagen de vista previa lee el PNG del disco y lo embebe como data URI — el renderer corre
+aislado y no resuelve rutas del sitio. Tampoco lee WebP ni dibuja emojis.
 
 ## Convenciones
 
