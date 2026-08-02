@@ -15,11 +15,13 @@ const initial: AdminState = {};
 
 export function TimezoneForm({
   current,
-  sample,
+  sampleTime,
+  sampleDate,
   groups,
 }: {
   current: string;
-  sample: string;
+  sampleTime: string;
+  sampleDate: string;
   /**
    * Vienen ya armadas desde el servidor, con el desfasaje incluido en la
    * etiqueta. Calcularlo acá daría distinto en Node y en el navegador
@@ -59,7 +61,7 @@ export function TimezoneForm({
       </div>
 
       <p className="hint">
-        Ahora mismo son las <strong>{sample}</strong> según la zona guardada.
+        Con la zona guardada, ahí son las <strong>{sampleTime}</strong> del {sampleDate}.
       </p>
     </form>
   );

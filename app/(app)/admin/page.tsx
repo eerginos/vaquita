@@ -79,7 +79,8 @@ export default async function AdminPage() {
         </p>
         <TimezoneForm
           current={tz}
-          sample={formatInTimeZone(new Date(), tz, "EEEE d 'de' MMMM, HH:mm", { locale: es })}
+          sampleTime={formatInTimeZone(new Date(), tz, "HH:mm")}
+          sampleDate={formatInTimeZone(new Date(), tz, "EEEE d 'de' MMMM", { locale: es })}
           groups={zoneGroups}
         />
       </section>
