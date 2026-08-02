@@ -150,6 +150,10 @@ No hay envío de mails (a propósito: una dependencia menos). Todo va por link:
 ## Notas de seguridad
 
 - Las contraseñas se guardan con bcrypt (12 rondas).
+- El login tiene freno a la fuerza bruta: 5 intentos fallidos por cuenta
+  y 20 por IP en una ventana de 15 minutos, con esperas que crecen
+  (1, 2, 5, 15, 30 minutos). El contador es por IP *y* email, así nadie
+  puede dejarte afuera de tu propia cuenta a propósito.
 - El token de sesión viaja en una cookie `httpOnly` + `SameSite=Lax`;
   en la base sólo se guarda su HMAC-SHA256 con `AUTH_SECRET`, nunca el token.
 - Cambiar la contraseña cierra todas las demás sesiones.

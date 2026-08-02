@@ -96,6 +96,18 @@ model Invitation {
   @@index([groupId])
 }
 
+/// Freno a la fuerza bruta contra el login. Una fila por clave:
+/// "ip|email" para el bloqueo fino y "ip" para el tope general.
+model LoginThrottle {
+  key         String    @id
+  fails       Int       @default(0)
+  firstFailAt DateTime  @default(now())
+  lockedUntil DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  @@index([updatedAt])
+}
+
 /// Token de un solo uso para restablecer la contraseña.
 /// Lo genera un admin y se comparte a mano (no hay SMTP).
 model PasswordReset {

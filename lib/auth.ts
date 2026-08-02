@@ -120,5 +120,9 @@ export async function pruneExpired(): Promise<void> {
   await Promise.all([
     prisma.session.deleteMany({ where: { expiresAt: { lt: now } } }),
     prisma.passwordReset.deleteMany({ where: { expiresAt: { lt: now } } }),
+    // Contadores de login que ya no sirven de nada.
+    prisma.loginThrottle.deleteMany({
+      where: { updatedAt: { lt: new Date(now.getTime() - 24 * 60 * 60 * 1000) } },
+    }),
   ]);
 }

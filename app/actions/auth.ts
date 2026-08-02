@@ -17,6 +17,13 @@ import {
 import { colorForSeed } from "@/lib/colors";
 import { emojiForSeed, isValidUserEmoji } from "@/lib/emojis";
 import { isInviteUsable } from "@/lib/invites";
+import {
+  chequearLimiteLogin,
+  clientIp,
+  limpiarLimiteLogin,
+  mensajeDeBloqueo,
+  registrarFalloLogin,
+} from "@/lib/rate-limit";
 
 export type ActionState = { error?: string; success?: string };
 
@@ -38,11 +45,21 @@ export async function signInAction(
 
   if (!email || !password) return { error: "Completá email y contraseña." };
 
+  // El freno se chequea antes de verificar la contraseña: bcrypt es caro a
+  // propósito, y sin esto cada intento fallido le costaría CPU al servidor.
+  const ip = await clientIp();
+  const limite = await chequearLimiteLogin(ip, email);
+  if (limite.bloqueado) return { error: mensajeDeBloqueo(limite.segundos) };
+
   const user = await prisma.user.findUnique({ where: { email } });
   // Mismo mensaje para usuario inexistente y contraseña mala: no filtramos qué emails existen.
   const ok = user ? await verifyPassword(password, user.passwordHash) : false;
-  if (!user || !ok) return { error: "Email o contraseña incorrectos." };
+  if (!user || !ok) {
+    await registrarFalloLogin(ip, email);
+    return { error: "Email o contraseña incorrectos." };
+  }
 
+  await limpiarLimiteLogin(ip, email);
   const ua = (await headers()).get("user-agent") ?? undefined;
   await createSession(user.id, ua);
   void pruneExpired().catch(() => {});
