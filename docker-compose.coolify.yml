@@ -1,0 +1,59 @@
+# Variante del stack para desplegar en Coolify.
+#
+# Es el mismo docker-compose.yml, con dos diferencias:
+#
+#   1. No publica puertos en el host. En Coolify el tráfico entra por su
+#      proxy, que es el que resuelve el dominio y el certificado. Si acá
+#      apareciera un `ports:`, la app quedaría colgada en el 3000 sin HTTPS
+#      y el dominio no andaría.
+#   2. Declara SERVICE_FQDN_APP_3000, que es como Coolify se entera de que
+#      tiene que rutear el dominio al puerto 3000 de este servicio.
+#
+# Para correrlo a mano en un VPS, sin Coolify, usá docker-compose.yml.
+#
+# En Coolify: Build Pack = Docker Compose, y en Docker Compose Location
+# poné /docker-compose.coolify.yml
+#
+# Las migraciones se aplican solas al arrancar el contenedor.
+
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Coolify le asigna un dominio y arma el ruteo hacia el 3000.
+      # El dominio se edita desde la interfaz, en este servicio.
+      - SERVICE_FQDN_APP_3000
+      # La conexión se arma acá a partir de las POSTGRES_* para no repetir la
+      # contraseña en dos lugares. Apunta al servicio `db` por la red interna.
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-vaquita}:${POSTGRES_PASSWORD:?falta POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-vaquita}?schema=public
+      - AUTH_SECRET=${AUTH_SECRET:?falta AUTH_SECRET}
+      # Tiene que coincidir con el dominio de arriba: con esto se arman los
+      # links de invitación y las vistas previas que se ven al compartirlos.
+      - APP_URL=${APP_URL:?falta APP_URL}
+      - BOOTSTRAP_ADMIN_EMAIL=${BOOTSTRAP_ADMIN_EMAIL:?falta BOOTSTRAP_ADMIN_EMAIL}
+      - TZ=${TZ:-America/Argentina/Buenos_Aires}
+    expose:
+      - "3000"
+
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-vaquita}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?falta POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB:-vaquita}
+      - TZ=${TZ:-America/Argentina/Buenos_Aires}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vaquita}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db-data:

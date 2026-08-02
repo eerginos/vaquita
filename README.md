@@ -103,6 +103,15 @@ reverse proxy adelante (Caddy, nginx, Traefik) para el dominio y el certificado.
 
 ## Deploy en Coolify
 
+Hay dos caminos. El de abajo crea la base como recurso propio de Coolify, que
+es lo que te habilita sus **backups automáticos** — para una app donde el dato
+es el producto, eso solo justifica los dos minutos extra.
+
+Si preferís levantar todo de una, usá Build Pack **Docker Compose** con
+*Docker Compose Location* en `/docker-compose.coolify.yml`, y cargá las
+variables de la tabla del paso 3 salvo `DATABASE_URL` (esa se arma sola) más
+`POSTGRES_PASSWORD`. Los backups en ese caso corren por tu cuenta.
+
 1. **Base de datos**: en tu proyecto de Coolify, `+ New` → `Database` →
    `PostgreSQL 17`. Anotá la connection string interna.
 
