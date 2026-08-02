@@ -11,14 +11,22 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="min-h-dvh">
-      <header className="sticky top-0 z-30 border-b bg-[var(--surface)]/90 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b bg-[var(--surface)] shadow-sm">
         <div className="relative mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4">
+          {/* Repisa: la parte de la vaca que sobresale necesita algo opaco
+              atrás, si no el contenido se ve pasar por detrás del dibujo al
+              scrollear. Va del borde izquierdo para que no quede flotando. */}
+          <span
+            aria-hidden
+            className="absolute left-0 top-full z-10 h-8 w-[100px] rounded-br-[28px] border-b border-r bg-[var(--surface)] sm:w-[112px]"
+          />
+
           {/* La vaca arranca en el borde de arriba y cuelga por debajo de la
               barra. El nombre va corrido a la derecha para dejarle el lugar. */}
           <Link href="/" className="flex items-center" title="Ir al inicio" aria-label="Ir al inicio">
             <VaquitaCabeza
               size={84}
-              className="absolute left-2 top-[3px] z-20 drop-shadow-[0_5px_9px_rgba(0,0,0,.35)] sm:left-3"
+              className="absolute left-2 top-[3px] z-20 drop-shadow-[0_4px_7px_rgba(0,0,0,.28)] sm:left-3"
             />
             <span className="ml-[74px] sm:ml-[86px]">
               <VaquitaTexto height={24} className="sm:hidden" />

@@ -116,6 +116,11 @@ la imagen de vista previa. Si cambia un original, hay que correr ese script.
 En la barra, la vaca arranca pegada al borde de arriba y sobresale **sólo hacia abajo**: la barra
 está fija en el tope de la ventana, así que todo lo que suba por encima se recorta.
 
+La parte de la vaca que sobresale se apoya en una **repisa opaca** (el `span` con `top-full` en el
+layout). Sin eso, al scrollear el contenido se ve pasar por detrás del dibujo. Por lo mismo la
+barra es de color sólido y no translúcida con blur. Si cambia el tamaño de la vaca, hay que ajustar
+el alto y el ancho de esa repisa.
+
 **El favicon no es la ilustración.** A 16px el dibujo con degradados y sombras se vuelve una mancha
 marrón, así que `brand/icono-simple.svg` es una versión aparte con las formas mínimas que
 sobreviven a ese tamaño: silueta con orejas, una mancha negra grande y el hocico rosa. La
