@@ -23,7 +23,15 @@ const trim = (f) => sharp(`brand/${f}`).trim({ threshold: 1 });
   await trim("texto.png").resize({ width: 480 }).png({ compressionLevel: 9, palette: true, quality: 88 })
     .toFile("public/marca/texto-og.png");
 
-  // Iconos: sobre el verde de la marca, porque iOS rellena de negro lo transparente.
+  // Favicon: versión simplificada. La ilustración con detalle se vuelve una
+  // mancha marrón a 16px, que es donde vive el favicon. El SVG lo usan los
+  // navegadores modernos a cualquier tamaño; el PNG es el respaldo.
+  fs.copyFileSync("brand/icono-simple.svg", "app/icon.svg");
+  await sharp("brand/icono-simple.svg", { density: 900 }).resize(48, 48)
+    .png({ compressionLevel: 9, palette: true }).toFile("app/icon.png");
+
+  // Iconos grandes: acá sí va la ilustración, que a ese tamaño luce.
+  // Sobre el verde de la marca, porque iOS rellena de negro lo transparente.
   const cara = await trim("cabeza.png").resize({ width: 800 }).png().toBuffer();
   const icono = async (size, pad) => {
     const inner = await sharp(cara)
@@ -33,7 +41,6 @@ const trim = (f) => sharp(`brand/${f}`).trim({ threshold: 1 });
       .composite([{ input: inner, gravity: "center" }])
       .png({ compressionLevel: 9, palette: true, quality: 90 }).toBuffer();
   };
-  await sharp(await icono(64, 2)).toFile("app/icon.png");
   await sharp(await icono(180, 10)).toFile("app/apple-icon.png");
   await sharp(await icono(192, 10)).toFile("public/icon-192.png");
   await sharp(await icono(512, 28)).toFile("public/icon-512.png");

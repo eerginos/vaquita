@@ -115,6 +115,12 @@ la imagen de vista previa. Si cambia un original, hay que correr ese script.
 En la barra, la vaca arranca pegada al borde de arriba y sobresale **sólo hacia abajo**: la barra
 está fija en el tope de la ventana, así que todo lo que suba por encima se recorta.
 
+**El favicon no es la ilustración.** A 16px el dibujo con degradados y sombras se vuelve una mancha
+marrón, así que `brand/icono-simple.svg` es una versión aparte con las formas mínimas que
+sobreviven a ese tamaño: silueta con orejas, una mancha negra grande y el hocico rosa. La
+ilustración sí se usa en los íconos grandes (apple-touch de 180px y los del manifest), donde el
+detalle suma.
+
 La imagen de vista previa lee el PNG del disco y lo embebe como data URI — el renderer corre
 aislado y no resuelve rutas del sitio. Tampoco lee WebP ni dibuja emojis.
 

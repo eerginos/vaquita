@@ -1,0 +1,33 @@
+<!--
+  Versión simplificada de la vaca, sólo para tamaños chicos (favicon).
+  La ilustración con detalle se vuelve una mancha marrón a 16px, así que acá
+  quedan nada más que los rasgos que sobreviven: la silueta con orejas, una
+  mancha negra grande y el hocico rosa. Sin sombras, sin degradados y sin
+  formas de menos de 3px en el lienzo de 64.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect width="64" height="64" rx="14" fill="#128268"/>
+
+  <!-- cuernos: cortos y gruesos, si no desaparecen -->
+  <path d="M20 15c-2-5 1-8 4-6 2 1 3 4 3 6Z" fill="#E9B44C"/>
+  <path d="M44 15c2-5-1-8-4-6-2 1-3 4-3 6Z" fill="#E9B44C"/>
+
+  <!-- orejas -->
+  <ellipse cx="11" cy="32" rx="9" ry="6" fill="#2A1A12" transform="rotate(-18 11 32)"/>
+  <ellipse cx="53" cy="32" rx="9" ry="6" fill="#2A1A12" transform="rotate(18 53 32)"/>
+
+  <!-- cara -->
+  <rect x="14" y="13" width="36" height="38" rx="16" fill="#FFF3E0"/>
+
+  <!-- la mancha: es lo que mas dice "vaca" cuando se pierde el resto -->
+  <path d="M38 15c9-2 12 5 8 10-5 6-14 3-14-3 0-4 3-6 6-7Z" fill="#2A1A12"/>
+
+  <!-- ojos -->
+  <circle cx="25" cy="27" r="3.2" fill="#2A1A12"/>
+  <circle cx="40" cy="28" r="3.2" fill="#2A1A12"/>
+
+  <!-- hocico -->
+  <rect x="21" y="34" width="22" height="15" rx="7.5" fill="#F5AFA6"/>
+  <ellipse cx="27" cy="41" rx="2.2" ry="3" fill="#2A1A12"/>
+  <ellipse cx="37" cy="41" rx="2.2" ry="3" fill="#2A1A12"/>
+</svg>
