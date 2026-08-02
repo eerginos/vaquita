@@ -45,5 +45,16 @@ const trim = (f) => sharp(`brand/${f}`).trim({ threshold: 1 });
   await sharp(await icono(192, 10)).toFile("public/icon-192.png");
   await sharp(await icono(512, 28)).toFile("public/icon-512.png");
 
+  // Banner del README: aplanado sobre el verde, porque el original es
+  // transparente y GitHub lo mostraria distinto en modo claro y oscuro.
+  fs.mkdirSync("docs", { recursive: true });
+  const banner = await sharp("brand/banner-original.png").trim({ threshold: 1 }).png().toBuffer();
+  const arte = await sharp(banner).resize({ width: 1120, height: 320, fit: "inside" }).png().toBuffer();
+  const dim = await sharp(arte).metadata();
+  await sharp({ create: { width: 1200, height: 400, channels: 4, background: VERDE } })
+    .composite([{ input: arte, left: Math.round((1200 - dim.width) / 2), top: Math.round((400 - dim.height) / 2) }])
+    .png({ compressionLevel: 9, palette: true, quality: 92 })
+    .toFile("docs/banner.png");
+
   console.log("marca regenerada");
 })();

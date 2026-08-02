@@ -1,7 +1,20 @@
-# Vaquita
+<p align="center">
+  <img src="docs/banner.png" alt="Vaquita" width="720">
+</p>
 
-Gastos compartidos entre amigos, autoalojado. Como hacer una vaquita, pero sin
-que nadie tenga que llevar la cuenta en una servilleta.
+<p align="center">
+  <strong>Gastos compartidos entre amigos, autoalojado.</strong><br>
+  Como hacer una vaquita, pero sin que nadie tenga que llevar la cuenta en una servilleta.
+</p>
+
+<p align="center">
+  <img alt="Next.js 16" src="https://img.shields.io/badge/Next.js-16-000?logo=nextdotjs&logoColor=white">
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white">
+  <img alt="PostgreSQL 17" src="https://img.shields.io/badge/PostgreSQL-17-4169E1?logo=postgresql&logoColor=white">
+  <img alt="Prisma 7" src="https://img.shields.io/badge/Prisma-7-2D3748?logo=prisma&logoColor=white">
+</p>
+
+---
 
 Registro cerrado por invitación, sin apps de terceros, sin límites de free tier.
 
