@@ -96,11 +96,13 @@ Cosas que ya costaron tiempo y conviene no volver a descubrir:
   navegador a una dirección inexistente.
 - **La imagen de vista previa no renderiza emojis** (el generador de Next no trae fuente de emoji):
   se dibujan como cuadraditos. Usá formas y texto.
-- **`TZ` viene con `America/Argentina/Buenos_Aires` por defecto en el Dockerfile**, y se puede
-  pisar con la variable de entorno. Las fechas se formatean en
-  el servidor; sin eso el contenedor corre en UTC y un gasto cargado después de las 21:00 aparece
-  con la fecha del día siguiente. Las fechas por defecto de los formularios se calculan en el
-  servidor y se pasan por prop, para que no difieran entre SSR e hidratación.
+- **Las fechas nunca se formatean con el reloj del proceso.** Todas las funciones de
+  `lib/dates.ts` reciben la zona explícita, que sale de `getTimezone()` (`lib/settings.ts`) y se
+  configura desde `/admin`. Así cambiarla tiene efecto inmediato y el resultado no depende de
+  dónde corra el contenedor; `TZ` sólo se usa como valor inicial. Las fechas por defecto de los
+  formularios se calculan en el servidor y se pasan por prop, para que no difieran entre SSR e
+  hidratación. Las fechas de formulario se guardan al mediodía de la zona elegida: la medianoche
+  puede correrse de día en el salto de horario de verano.
 - **El seed es destructivo.** Nunca contra producción.
 
 ## Convenciones
