@@ -1,6 +1,6 @@
 # Contexto del proyecto
 
-Por qué las cosas son como son. `README.md` explica cómo levantarlo, `CLAUDE.md` cómo trabajar
+Por qué las cosas son como son. `README.md` explica cómo levantarlo, `AGENTS.md` cómo trabajar
 adentro; esto es el registro de decisiones, para no volver a discutir lo ya discutido ni repetir
 un camino que se descartó por algo.
 

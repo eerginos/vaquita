@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
+import { getTimezone } from "@/lib/settings";
+import { formatInTimeZone } from "date-fns-tz";
+import { es } from "date-fns/locale";
 import { revokeInviteAction } from "@/app/actions/groups";
 import { toggleAdminAction } from "@/app/actions/admin";
 import { formatDate, formatRelative } from "@/lib/dates";
@@ -10,12 +13,14 @@ import { Avatar } from "@/components/avatar";
 import { SubmitButton } from "@/components/submit-button";
 import { CopyField } from "@/components/copy-field";
 import { InviteForm } from "./invite-form";
+import { TimezoneForm } from "./timezone-form";
 import { ResetPasswordForm } from "./reset-password-form";
 
 export const metadata: Metadata = { title: "Administración" };
 
 export default async function AdminPage() {
   const me = await requireAdmin();
+  const tz = await getTimezone();
 
   const [users, allInvites] = await Promise.all([
     prisma.user.findMany({
@@ -55,6 +60,19 @@ export default async function AdminPage() {
       </div>
 
       <section className="card p-5">
+        <h2 className="mb-1 text-sm font-semibold">Zona horaria</h2>
+        <p className="hint mb-4">
+          Con la que se muestran todas las fechas. Las fechas se arman en el servidor, así que sin
+          esto un gasto cargado de noche aparecería con la fecha del día siguiente. El cambio se ve
+          al instante, no hace falta reiniciar nada.
+        </p>
+        <TimezoneForm
+          current={tz}
+          sample={formatInTimeZone(new Date(), tz, "EEEE d 'de' MMMM, HH:mm", { locale: es })}
+        />
+      </section>
+
+      <section className="card p-5">
         <h2 className="mb-1 text-sm font-semibold">Invitar a alguien nuevo</h2>
         <p className="hint mb-4">
           Genera un link para crear cuenta sin quedar en ningún grupo. Para invitar directo a un
@@ -76,7 +94,7 @@ export default async function AdminPage() {
                   <p className="hint">
                     {invite.label && <strong>{invite.label} · </strong>}
                     {invite.group ? `${invite.group.emoji} ${invite.group.name} · ` : "sin grupo · "}
-                    {usesLabel(invite)} · vence el {formatDate(invite.expiresAt)}
+                    {usesLabel(invite)} · vence el {formatDate(invite.expiresAt, tz)}
                   </p>
                   <form action={revokeInviteAction}>
                     <input type="hidden" name="inviteId" value={invite.id} />
@@ -109,7 +127,7 @@ export default async function AdminPage() {
                 <p className="truncate text-xs text-[var(--text-muted)]">
                   {user.email} · {user._count.memberships}{" "}
                   {user._count.memberships === 1 ? "grupo" : "grupos"} · se registró{" "}
-                  {formatRelative(user.createdAt)}
+                  {formatRelative(user.createdAt, tz)}
                 </p>
               </div>
 

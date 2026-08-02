@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { hashPassword, hashResetToken, newToken, requireAdmin, requireUser } from "@/lib/auth";
 import { inviteLifetimeDays, inviteUrl } from "@/lib/invites";
+import { setTimezone } from "@/lib/settings";
+import { isValidTimezone, timezoneLabel } from "@/lib/timezones";
 
 export type AdminState = { error?: string; success?: string; link?: string };
 
@@ -39,6 +41,22 @@ export async function createGlobalInviteAction(
       : `Link de un solo uso, vence en ${days} días.`,
     link: inviteUrl(appUrl(), invite.code),
   };
+}
+
+export async function updateTimezoneAction(
+  _prev: AdminState,
+  formData: FormData,
+): Promise<AdminState> {
+  await requireAdmin();
+  const timezone = String(formData.get("timezone") ?? "").trim();
+
+  if (!isValidTimezone(timezone)) return { error: "Esa zona horaria no existe." };
+
+  await setTimezone(timezone);
+  // Toca todo: las fechas se muestran en cada pantalla.
+  revalidatePath("/", "layout");
+
+  return { success: `Listo, las fechas ahora se muestran en hora de ${timezoneLabel(timezone)}.` };
 }
 
 export async function createPasswordResetAction(

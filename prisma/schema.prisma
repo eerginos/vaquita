@@ -12,6 +12,17 @@ datasource db {
   provider = "postgresql"
 }
 
+// ----------------------------------------------------------- configuración
+
+/// Una sola fila, con id fijo "app". Guarda lo que se configura desde
+/// /admin y no tiene sentido pedir por variable de entorno.
+model AppSettings {
+  id        String   @id @default("app")
+  /// Zona IANA con la que se formatean todas las fechas.
+  timezone  String   @default("America/Argentina/Buenos_Aires")
+  updatedAt DateTime @updatedAt
+}
+
 // ---------------------------------------------------------------- usuarios
 
 model User {

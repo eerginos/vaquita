@@ -7,6 +7,7 @@ import { deleteExpenseAction } from "@/app/actions/expenses";
 import { deleteCommentAction } from "@/app/actions/comments";
 import { getCategory } from "@/lib/categories";
 import { formatDate, formatRelative } from "@/lib/dates";
+import { getTimezone } from "@/lib/settings";
 import { formatMoney } from "@/lib/money";
 import { SPLIT_TYPES } from "@/lib/split";
 import { Avatar } from "@/components/avatar";
@@ -33,6 +34,7 @@ export default async function ExpenseDetailPage({
 }) {
   const { groupId, expenseId } = await params;
   const user = await requireUser();
+  const tz = await getTimezone();
 
   const expense = await prisma.expense.findUnique({
     where: { id: expenseId },
@@ -84,7 +86,7 @@ export default async function ExpenseDetailPage({
           <div className="min-w-0 flex-1">
             <h1 className="text-xl font-semibold tracking-tight">{expense.description}</h1>
             <p className="mt-0.5 text-sm text-[var(--text-muted)]">
-              {formatDate(expense.date)} · {category.label}
+              {formatDate(expense.date, tz)} · {category.label}
             </p>
           </div>
           <p className="text-right text-2xl font-bold tabular-nums">
@@ -197,7 +199,7 @@ export default async function ExpenseDetailPage({
 
       <p className="px-1 text-xs text-[var(--text-muted)]">
         Cargado por {expense.createdBy.id === user.id ? "vos" : expense.createdBy.name}{" "}
-        {formatRelative(expense.createdAt)}
+        {formatRelative(expense.createdAt, tz)}
       </p>
 
       <section className="card p-5">
@@ -214,7 +216,7 @@ export default async function ExpenseDetailPage({
                   <p className="text-sm">
                     <span className="font-medium">{comment.user.name}</span>{" "}
                     <span className="text-xs text-[var(--text-muted)]">
-                      {formatRelative(comment.createdAt)}
+                      {formatRelative(comment.createdAt, tz)}
                     </span>
                   </p>
                   <p className="whitespace-pre-wrap text-sm text-[var(--text)]">{comment.body}</p>

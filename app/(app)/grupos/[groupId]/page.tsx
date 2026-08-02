@@ -8,6 +8,7 @@ import { formatDate, formatMonthYear, monthKey } from "@/lib/dates";
 import { getCategory } from "@/lib/categories";
 import { formatMoney, formatMoneyAbs } from "@/lib/money";
 import { shortNames } from "@/lib/names";
+import { getTimezone } from "@/lib/settings";
 import { quickSettleAction } from "@/app/actions/settlements";
 import { Avatar, AvatarStack } from "@/components/avatar";
 import { Balance } from "@/components/money";
@@ -29,9 +30,10 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
   if (!group) notFound();
   if (!group.members.some((m) => m.id === user.id)) notFound();
 
-  const [timeline, totals] = await Promise.all([
+  const [timeline, totals, tz] = await Promise.all([
     getGroupTimeline(groupId),
     getGroupTotals(groupId),
+    getTimezone(),
   ]);
   const myBalance = group.net.get(user.id) ?? 0n;
   const myCosts = totals.costsByUser.get(user.id) ?? 0n;
@@ -44,7 +46,7 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
   // Agrupo la lista por mes para que se lea como un extracto.
   const months = new Map<string, typeof timeline>();
   for (const item of timeline) {
-    const key = monthKey(item.date);
+    const key = monthKey(item.date, tz);
     if (!months.has(key)) months.set(key, []);
     months.get(key)!.push(item);
   }
@@ -244,7 +246,7 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
             {[...months.entries()].map(([key, items]) => (
               <div key={key}>
                 <h3 className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">
-                  {formatMonthYear(items[0].date)}
+                  {formatMonthYear(items[0].date, tz)}
                 </h3>
 
                 <ul className="card divide-y">
@@ -257,6 +259,7 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
                         currency={group.currency}
                         expense={item.data}
                         shortOf={shortOf}
+                        tz={tz}
                       />
                     ) : (
                       <SettlementRow
@@ -265,6 +268,7 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
                         currency={group.currency}
                         settlement={item.data}
                         shortOf={shortOf}
+                        tz={tz}
                       />
                     ),
                   )}
@@ -288,12 +292,14 @@ function ExpenseRow({
   currency,
   expense,
   shortOf,
+  tz,
 }: {
   groupId: string;
   userId: string;
   currency: string;
   expense: ExpenseItem;
   shortOf: (id: string) => string;
+  tz: string;
 }) {
   const category = getCategory(expense.category);
   const paid = expense.payers.find((p) => p.userId === userId)?.amountCents ?? 0n;
@@ -320,7 +326,7 @@ function ExpenseRow({
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium">{expense.description}</p>
           <p className="truncate text-xs text-[var(--text-muted)]">
-            {formatDate(expense.date)} · {payerLabel} {formatMoney(expense.amountCents, currency)}
+            {formatDate(expense.date, tz)} · {payerLabel} {formatMoney(expense.amountCents, currency)}
             {expense._count.comments > 0 && <> · 💬 {expense._count.comments}</>}
           </p>
         </div>
@@ -355,11 +361,13 @@ function SettlementRow({
   currency,
   settlement,
   shortOf,
+  tz,
 }: {
   userId: string;
   currency: string;
   settlement: SettlementItem;
   shortOf: (id: string) => string;
+  tz: string;
 }) {
   // "Vos le pagó a Sofía" no se puede leer: cuando participa quien mira,
   // la frase va conjugada en segunda persona.
@@ -378,7 +386,7 @@ function SettlementRow({
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium">{label}</p>
         <p className="truncate text-xs text-[var(--text-muted)]">
-          {formatDate(settlement.date)}
+          {formatDate(settlement.date, tz)}
           {settlement.note && ` · ${settlement.note}`}
         </p>
       </div>

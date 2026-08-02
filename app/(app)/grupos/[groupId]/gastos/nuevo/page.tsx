@@ -7,6 +7,7 @@ import { requireUser } from "@/lib/auth";
 import { createExpenseAction } from "@/app/actions/expenses";
 import { ExpenseForm } from "@/components/expense-form";
 import { toDateInput } from "@/lib/dates";
+import { getTimezone } from "@/lib/settings";
 
 export const metadata: Metadata = { title: "Nuevo gasto" };
 
@@ -17,6 +18,7 @@ export default async function NewExpensePage({
 }) {
   const { groupId } = await params;
   const user = await requireUser();
+  const tz = await getTimezone();
 
   const group = await prisma.group.findUnique({
     where: { id: groupId },
@@ -46,7 +48,7 @@ export default async function NewExpensePage({
           members={group.members.map((m) => m.user)}
           currentUserId={user.id}
           cancelHref={`/grupos/${groupId}`}
-          defaultDate={toDateInput(new Date())}
+          defaultDate={toDateInput(new Date(), tz)}
         />
       </div>
     </div>

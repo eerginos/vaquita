@@ -3,6 +3,9 @@ node_modules
 .git
 .github
 .claude
+.cursor
+.windsurf
+.agents
 .env
 .env.local
 *.md

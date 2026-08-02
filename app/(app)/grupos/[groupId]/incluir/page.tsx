@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { getGroupDetail } from "@/lib/queries";
 import { formatDateShort } from "@/lib/dates";
+import { getTimezone } from "@/lib/settings";
 import { IncludeForm, type ClientExpense } from "./include-form";
 
 export const metadata: Metadata = { title: "Sumar a gastos anteriores" };
@@ -20,6 +21,7 @@ export default async function IncludePage({
   const { groupId } = await params;
   const { quien } = await searchParams;
   const user = await requireUser();
+  const tz = await getTimezone();
 
   const group = await getGroupDetail(groupId);
   if (!group || !group.members.some((m) => m.id === user.id)) notFound();
@@ -44,7 +46,7 @@ export default async function IncludePage({
   const clientExpenses: ClientExpense[] = expenses.map((e) => ({
     id: e.id,
     description: e.description,
-    dateLabel: formatDateShort(e.date),
+    dateLabel: formatDateShort(e.date, tz),
     category: e.category,
     amountCents: e.amountCents.toString(),
     splitType: e.splitType,

@@ -8,6 +8,7 @@ import { updateExpenseAction } from "@/app/actions/expenses";
 import { ExpenseForm, type ExpenseInitial } from "@/components/expense-form";
 import { centsToInput } from "@/lib/money";
 import { toDateInput } from "@/lib/dates";
+import { getTimezone } from "@/lib/settings";
 
 export const metadata: Metadata = { title: "Editar gasto" };
 
@@ -18,6 +19,7 @@ export default async function EditExpensePage({
 }) {
   const { groupId, expenseId } = await params;
   const user = await requireUser();
+  const tz = await getTimezone();
 
   const [group, expense] = await Promise.all([
     prisma.group.findUnique({
@@ -42,7 +44,7 @@ export default async function EditExpensePage({
     id: expense.id,
     description: expense.description,
     amountInput: centsToInput(expense.amountCents),
-    date: toDateInput(expense.date),
+    date: toDateInput(expense.date, tz),
     category: expense.category,
     notes: expense.notes ?? "",
     splitType: expense.splitType,
@@ -76,7 +78,7 @@ export default async function EditExpensePage({
           currentUserId={user.id}
           initial={initial}
           cancelHref={`/grupos/${groupId}/gastos/${expenseId}`}
-          defaultDate={toDateInput(new Date())}
+          defaultDate={toDateInput(new Date(), tz)}
         />
       </div>
     </div>

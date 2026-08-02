@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { requireUser } from "@/lib/auth";
+import { getTimezone } from "@/lib/settings";
 import { prisma } from "@/lib/db";
 import { formatRelative } from "@/lib/dates";
 import { revokeAllSessionsAction } from "@/app/actions/admin";
@@ -13,6 +14,7 @@ export const metadata: Metadata = { title: "Mi perfil" };
 
 export default async function ProfilePage() {
   const user = await requireUser();
+  const tz = await getTimezone();
   const sessions = await prisma.session.count({
     where: { userId: user.id, expiresAt: { gt: new Date() } },
   });
@@ -29,7 +31,7 @@ export default async function ProfilePage() {
           <h1 className="truncate text-xl font-semibold tracking-tight">{user.name}</h1>
           <p className="truncate text-sm text-[var(--text-muted)]">{user.email}</p>
           <p className="text-xs text-[var(--text-soft)]">
-            Cuenta creada {formatRelative(account.createdAt)}
+            Cuenta creada {formatRelative(account.createdAt, tz)}
           </p>
         </div>
       </div>

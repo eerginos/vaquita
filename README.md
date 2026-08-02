@@ -7,7 +7,7 @@ Registro cerrado por invitación, sin apps de terceros, sin límites de free tie
 
 > Este archivo es cómo levantarlo y desplegarlo.
 > [`CONTEXT.md`](CONTEXT.md) explica por qué las cosas son como son y qué se decidió no hacer.
-> [`CLAUDE.md`](CLAUDE.md) es la guía para trabajar en el código.
+> [`AGENTS.md`](AGENTS.md) es la guía para trabajar en el código.
 
 ## Qué hace
 
@@ -98,10 +98,8 @@ reverse proxy adelante (Caddy, nginx, Traefik) para el dominio y el certificado.
    | `APP_URL` | `https://split.erginos.com.ar` |
    | `BOOTSTRAP_ADMIN_EMAIL` | Tu email |
 
-   `TZ` es opcional: el Dockerfile ya trae `America/Argentina/Buenos_Aires`.
-   Las fechas se formatean en el servidor, así que sin zona horaria el
-   contenedor correría en UTC y un gasto cargado de noche quedaría con la fecha
-   del día siguiente. Desde otro país, pasá `TZ` con tu zona.
+   La zona horaria **no** es una variable: se elige desde `/admin` y queda
+   guardada en la base. `TZ` sólo se usa como valor inicial la primera vez.
 
 4. **Dominio**: poné `https://split.erginos.com.ar`. Coolify saca el
    certificado con Let's Encrypt solo.

@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { fromDateInput } from "@/lib/dates";
+import { getTimezone } from "@/lib/settings";
 import { parseAmountToCents } from "@/lib/money";
 import { settlementPlan } from "@/lib/balances";
 import { loadLedgers } from "@/lib/queries";
@@ -49,7 +50,7 @@ export async function createSettlementAction(
         toUserId,
         amountCents,
         currency: group.currency,
-        date: dateRaw ? fromDateInput(dateRaw) : new Date(),
+        date: dateRaw ? fromDateInput(dateRaw, await getTimezone()) : new Date(),
         note,
         createdById: user.id,
       },

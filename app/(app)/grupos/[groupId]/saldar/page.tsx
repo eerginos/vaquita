@@ -6,6 +6,7 @@ import { requireUser } from "@/lib/auth";
 import { getGroupDetail } from "@/lib/queries";
 import { centsToInput, formatMoney } from "@/lib/money";
 import { toDateInput } from "@/lib/dates";
+import { getTimezone } from "@/lib/settings";
 import { SettleForm } from "./settle-form";
 
 export const metadata: Metadata = { title: "Saldar cuentas" };
@@ -20,6 +21,7 @@ export default async function SettlePage({
   const { groupId } = await params;
   const { de, a, monto } = await searchParams;
   const user = await requireUser();
+  const tz = await getTimezone();
 
   const group = await getGroupDetail(groupId);
   if (!group || !group.members.some((m) => m.id === user.id)) notFound();
@@ -60,7 +62,7 @@ export default async function SettlePage({
             toUserId: a ?? "",
             amountInput: monto ?? "",
           }}
-          defaultDate={toDateInput(new Date())}
+          defaultDate={toDateInput(new Date(), tz)}
         />
       </div>
     </div>

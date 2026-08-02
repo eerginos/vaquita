@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { getGroupDetail } from "@/lib/queries";
+import { getTimezone } from "@/lib/settings";
 import {
   createGroupInviteAction,
   deleteGroupAction,
@@ -30,6 +31,7 @@ export default async function GroupSettingsPage({
 }) {
   const { groupId } = await params;
   const user = await requireUser();
+  const tz = await getTimezone();
 
   const group = await getGroupDetail(groupId);
   if (!group || !group.members.some((m) => m.id === user.id)) notFound();
@@ -161,7 +163,7 @@ export default async function GroupSettingsPage({
                 <div className="flex items-center justify-between">
                   <p className="hint">
                     {invite.label ? `${invite.label} · ` : ""}
-                    {usesLabel(invite)} · vence el {formatDate(invite.expiresAt)}
+                    {usesLabel(invite)} · vence el {formatDate(invite.expiresAt, tz)}
                   </p>
                   <form action={revokeInviteAction}>
                     <input type="hidden" name="inviteId" value={invite.id} />

@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { requireUser } from "@/lib/auth";
 import { getActivity } from "@/lib/queries";
+import { getTimezone } from "@/lib/settings";
 import { formatRelative } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 import { Avatar } from "@/components/avatar";
@@ -78,7 +79,7 @@ function describe(type: string, actorName: string, isMe: boolean, meta: Meta): R
 
 export default async function ActivityPage() {
   const user = await requireUser();
-  const activities = await getActivity(user.id);
+  const [activities, tz] = await Promise.all([getActivity(user.id), getTimezone()]);
 
   return (
     <div className="space-y-4">
@@ -109,7 +110,7 @@ export default async function ActivityPage() {
                         {activity.group.emoji} {activity.group.name} ·
                       </span>
                     )}
-                    {formatRelative(activity.createdAt)}
+                    {formatRelative(activity.createdAt, tz)}
                   </p>
                 </div>
               </div>

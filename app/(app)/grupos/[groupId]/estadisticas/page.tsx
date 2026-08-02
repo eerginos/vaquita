@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { requireUser } from "@/lib/auth";
 import { getGroupDetail, getGroupStats } from "@/lib/queries";
+import { getTimezone } from "@/lib/settings";
 import { getCategory } from "@/lib/categories";
 import { formatDate, fromDateInput, toDateInput } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
@@ -22,6 +23,7 @@ export default async function StatsPage({
   const { groupId } = await params;
   const { desde, hasta, quien } = await searchParams;
   const user = await requireUser();
+  const tz = await getTimezone();
 
   const group = await getGroupDetail(groupId);
   if (!group || !group.members.some((m) => m.id === user.id)) notFound();
@@ -29,8 +31,8 @@ export default async function StatsPage({
   const filterUserId = quien && group.members.some((m) => m.id === quien) ? quien : undefined;
 
   const stats = await getGroupStats(groupId, {
-    from: desde ? fromDateInput(desde) : undefined,
-    to: hasta ? fromDateInput(hasta) : undefined,
+    from: desde ? fromDateInput(desde, tz) : undefined,
+    to: hasta ? fromDateInput(hasta, tz) : undefined,
     userId: filterUserId,
   });
 
@@ -58,7 +60,7 @@ export default async function StatsPage({
               id="desde"
               name="desde"
               type="date"
-              defaultValue={desde ?? (stats.firstDate ? toDateInput(stats.firstDate) : "")}
+              defaultValue={desde ?? (stats.firstDate ? toDateInput(stats.firstDate, tz) : "")}
               className="input"
             />
           </div>
@@ -70,7 +72,7 @@ export default async function StatsPage({
               id="hasta"
               name="hasta"
               type="date"
-              defaultValue={hasta ?? (stats.lastDate ? toDateInput(stats.lastDate) : "")}
+              defaultValue={hasta ?? (stats.lastDate ? toDateInput(stats.lastDate, tz) : "")}
               className="input"
             />
           </div>
@@ -218,7 +220,7 @@ export default async function StatsPage({
                   icon="🏆"
                   label="El gasto más caro"
                   value={`${stats.biggest.description} · ${formatMoney(stats.biggest.amountCents, currency)}`}
-                  hint={formatDate(stats.biggest.date)}
+                  hint={formatDate(stats.biggest.date, tz)}
                 />
               )}
               {topLoader && (
@@ -241,7 +243,7 @@ export default async function StatsPage({
                 <Fact
                   icon="📅"
                   label="Período"
-                  value={`${formatDate(stats.firstDate)} — ${formatDate(stats.lastDate)}`}
+                  value={`${formatDate(stats.firstDate, tz)} — ${formatDate(stats.lastDate, tz)}`}
                 />
               )}
             </dl>

@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { fromDateInput } from "@/lib/dates";
+import { getTimezone } from "@/lib/settings";
 import { parseAmountToCents } from "@/lib/money";
 import { computePayers, computeShares, resplitWith, type SplitType } from "@/lib/split";
 import { getCategory } from "@/lib/categories";
@@ -56,7 +57,7 @@ async function parseExpenseForm(
   }
 
   const dateRaw = text(formData, "date");
-  const date = dateRaw ? fromDateInput(dateRaw) : new Date();
+  const date = dateRaw ? fromDateInput(dateRaw, await getTimezone()) : new Date();
   if (Number.isNaN(date.getTime())) return { ok: false, error: "La fecha no es válida." };
 
   const category = getCategory(text(formData, "category")).id;

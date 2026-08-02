@@ -12,6 +12,12 @@ lib/generated/
 .env.local
 .env*.local
 
+# Config local de editores y asistentes
+.claude/
+.cursor/
+.windsurf/
+.agents/
+
 # Varios
 .DS_Store
 *.pem
