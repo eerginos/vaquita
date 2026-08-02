@@ -53,7 +53,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-6xl gap-8 px-4 pb-24 pt-10 md:pb-8 md:pt-8">
+      {/* El padding de arriba deja pasar la parte de la vaca que cuelga de la
+          barra. Si cambia el tamaño de la vaca, hay que revisarlo. */}
+      <div className="mx-auto flex max-w-6xl gap-8 px-4 pb-24 pt-16 md:pb-8 md:pt-14">
         <aside className="hidden w-52 shrink-0 md:block">
           <div className="sticky top-20">
             <SidebarNav isAdmin={user.isAdmin} />
