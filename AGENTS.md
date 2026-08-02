@@ -121,6 +121,9 @@ sobreviven a ese tamaño: silueta con orejas, una mancha negra grande y el hocic
 ilustración sí se usa en los íconos grandes (apple-touch de 180px y los del manifest), donde el
 detalle suma.
 
+Las capturas del README están en `docs/` y se sacan a mano con el navegador, no se generan solas:
+si cambia bastante la interfaz, conviene rehacerlas. El banner sí lo regenera `npm run marca`.
+
 La imagen de vista previa lee el PNG del disco y lo embebe como data URI — el renderer corre
 aislado y no resuelve rutas del sitio. Tampoco lee WebP ni dibuja emojis.
 

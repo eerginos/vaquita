@@ -18,6 +18,16 @@
 
 Registro cerrado por invitación, sin apps de terceros, sin límites de free tier.
 
+<p align="center">
+  <img src="docs/captura-resumen.png" alt="Pantalla de resumen: saldo total, grupos y con quién estás en deuda" width="820">
+</p>
+
+<p align="center">
+  <img src="docs/captura-grupo.png" alt="Detalle de un grupo: saldo, consumo, quién le debe a quién y los movimientos" width="820">
+  <br>
+  <sub>Adentro de un grupo: quién le debe a quién, ya simplificado, y el botón para saldar de un click.</sub>
+</p>
+
 > Este archivo es cómo levantarlo y desplegarlo.
 > [`CONTEXT.md`](CONTEXT.md) explica por qué las cosas son como son y qué se decidió no hacer.
 > [`AGENTS.md`](AGENTS.md) es la guía para trabajar en el código.
