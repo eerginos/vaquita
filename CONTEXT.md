@@ -6,11 +6,11 @@ un camino que se descartó por algo.
 
 ## El problema
 
-Splitwise resuelve bien dividir gastos, pero es un servicio de terceros con límites y publicidad,
-y la data de quién le debe cuánto a quién queda en un servidor ajeno. Esto es lo mismo, gratis,
-corriendo en un VPS propio, para un grupo cerrado de amigos.
+Las apps para dividir gastos entre amigos existen y funcionan, pero son servicios de terceros: con
+límites, con publicidad, y con la data de quién le debe cuánto a quién viviendo en un servidor
+ajeno. Esto hace lo mismo, gratis, corriendo en un VPS propio, para un grupo cerrado.
 
-Del uso real de Splitwise salieron dos dolores concretos que acá están resueltos:
+De usarlas en serio salieron dos dolores concretos que acá están resueltos:
 
 1. **Sumar a alguien tarde.** Armás el grupo, cargás gastos, y recién después se suman los que
    faltaban: los gastos viejos no los incluyen y hay que editarlos de a uno. Acá hay una pantalla
@@ -38,8 +38,8 @@ de 14: un link que crea cuentas puede reenviarse fuera del grupo, y cuanto menos
 mejor. Siempre se puede revocar.
 
 **El alias de pago vive en el perfil y sólo lo ve quien tiene que pagar.** En Argentina la fricción
-real para saldar no es calcular cuánto, es conseguir el alias. Splittr hace lo mismo con links de
-PayPal.
+real para saldar no es calcular cuánto, es conseguir el alias. Otras apps del rubro resuelven lo
+mismo con links de pago, que acá no aplican.
 
 **Deudas simplificadas es opcional por grupo.** Simplificar reduce la cantidad de transferencias
 pero rompe la trazabilidad de quién gastó con quién. Hay grupos donde eso importa (convivientes) y
@@ -49,9 +49,10 @@ grupos donde no (un viaje). Que lo decida cada grupo.
 sienta de ellos y no de una herramienta. El color quedó como tinte de fondo, asignado
 automáticamente: dos cosas compitiendo por identificar a la misma persona era una de más.
 
-**Los datos sueltos de estadísticas son neutrales a propósito.** Splittr muestra "el más generoso"
-y "el que más debe". Un ranking público de quién debe más puede picar entre amigos, así que acá van
-datos sin juicio: el gasto más caro, quién cargó más, quién adelantó más plata.
+**Los datos sueltos de estadísticas son neutrales a propósito.** Es común que estas apps muestren
+rankings tipo "el más generoso" o "el que más debe". Un ranking público de quién debe más puede
+picar entre amigos, así que acá van datos sin juicio: el gasto más caro, quién cargó más, quién
+adelantó más plata.
 
 ## Lo que se decidió NO hacer
 
@@ -84,7 +85,8 @@ No están descartadas para siempre; se dejaron afuera con una razón.
 
 Se construyó en una sola sesión, en este orden: núcleo (grupos, gastos, saldos, pagos) → deploy en
 Coolify → responsive y zona horaria → recálculo retroactivo → autocompletado del reparto → avatares
-con emoji → ideas tomadas de Splittr (alias, saldar de un click, estadísticas) → marca propia →
+con emoji → ideas prestadas de otras apps del rubro (alias, saldar de un click, estadísticas) →
+marca propia →
 invitaciones para varios con vista previa en WhatsApp.
 
 El repo es privado: `github.com/eerginos/vaquita`.

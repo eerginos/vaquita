@@ -17,7 +17,7 @@ export function SignUpForm({ code }: { code: string }) {
   const [emoji, setEmoji] = useState("");
 
   // Hasta que elija uno, se muestra el que le tocaría por defecto.
-  const shownEmoji = emoji || emojiForSeed(name || "split");
+  const shownEmoji = emoji || emojiForSeed(name || "vaquita");
 
   return (
     <form action={action} className="space-y-4">

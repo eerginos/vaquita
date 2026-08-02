@@ -24,7 +24,7 @@ const PEOPLE = [
     name: "Emiliano",
     email: process.env.BOOTSTRAP_ADMIN_EMAIL || "emi@ejemplo.com",
     isAdmin: true,
-    payAlias: "emiliano.split.mp",
+    payAlias: "emiliano.vaquita.mp",
   },
   { name: "Sofía Ruiz", email: "sofia@ejemplo.com", isAdmin: false, payAlias: "sofiaruiz.mp" },
   { name: "Martín Paz", email: "martin@ejemplo.com", isAdmin: false, payAlias: "0000003100010000000001" },

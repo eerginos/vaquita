@@ -118,13 +118,13 @@ reverse proxy adelante (Caddy, nginx, Traefik) para el dominio y el certificado.
    |---|---|
    | `DATABASE_URL` | La connection string interna del Postgres de Coolify |
    | `AUTH_SECRET` | `openssl rand -hex 32` |
-   | `APP_URL` | `https://split.erginos.com.ar` |
+   | `APP_URL` | La URL pública, por ejemplo `https://vaquita.tudominio.com` |
    | `BOOTSTRAP_ADMIN_EMAIL` | Tu email |
 
    La zona horaria **no** es una variable: se elige desde `/admin` y queda
    guardada en la base. `TZ` sólo se usa como valor inicial la primera vez.
 
-4. **Dominio**: poné `https://split.erginos.com.ar`. Coolify saca el
+4. **Dominio**: poné el tuyo, el mismo que `APP_URL`. Coolify saca el
    certificado con Let's Encrypt solo.
 
 5. Deploy. El contenedor corre `prisma migrate deploy` al arrancar, así que

@@ -6,7 +6,8 @@ para una persona que llega al proyecto.
 
 ## Qué es
 
-Vaquita: un clon de Splitwise autoalojado, privado, para un grupo de amigos en Argentina.
+Vaquita: app autoalojada para dividir gastos entre amigos, privada, pensada para un grupo
+chico en Argentina.
 Web solamente (responsive, sin app nativa). Registro cerrado por invitación.
 La UI, las rutas y los comentarios del código están **en español rioplatense** — mantené ese registro.
 
