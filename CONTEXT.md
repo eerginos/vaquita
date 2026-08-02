@@ -69,6 +69,11 @@ No están descartadas para siempre; se dejaron afuera con una razón.
 | **Badges de no leído** | Requiere trackear última lectura por persona y por grupo. Plomería para poca cosa. |
 | **Tests automatizados** | Con un solo desarrollador y verificación manual en el navegador, el costo superaba al beneficio. **Si esto cambia, `lib/money.ts`, `lib/balances.ts` y `lib/split.ts` son lo primero que hay que cubrir**: son funciones puras, sin dependencias, y son donde un error se traduce en plata mal calculada. |
 
+**Licencia MIT.** La más permisiva y la más corta. Además del permiso, aporta lo que importa
+incluso con el repo privado: el descargo de garantía y la limitación de responsabilidad. En una app
+que calcula plata eso no es un formalismo. Si en algún momento se cobra por hostearla, conviene
+revisarla: con MIT cualquiera puede tomar el código, cambiarle la marca y vender el mismo servicio.
+
 ## Deuda conocida
 
 - **`npm audit` marca 3 vulnerabilidades *high*** en `postcss` y `sharp`, ambas dentro del propio

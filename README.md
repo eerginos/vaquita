@@ -162,3 +162,9 @@ No hay envío de mails (a propósito: una dependencia menos). Todo va por link:
 Multi-moneda con conversión, recibos adjuntos, gastos recurrentes y
 notificaciones por email. La estructura ya está preparada: los gastos guardan
 `currency` propio y los balances se agrupan por moneda.
+
+## Licencia
+
+[MIT](LICENSE) — hacé lo que quieras con esto, manteniendo el aviso de
+copyright. Se entrega sin garantías: si lo desplegás, la responsabilidad de
+que los números estén bien es tuya.
