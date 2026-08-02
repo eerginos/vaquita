@@ -166,7 +166,7 @@ export function SettleForm({
           name="note"
           maxLength={200}
           className="input"
-          placeholder="Transferencia, efectivo, MercadoPago…"
+          placeholder="Transferencia, efectivo…"
         />
       </div>
 

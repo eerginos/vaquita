@@ -56,7 +56,7 @@ export function ProfileForm({
           defaultValue={payAlias ?? ""}
           maxLength={120}
           className="input"
-          placeholder="emiliano.mp, CBU, o link de Mercado Pago"
+          placeholder="Alias, CBU, IBAN o link de pago"
         />
         <p className="hint mt-1">
           Se le muestra sólo a quien te tenga que pagar, para que no tenga que pedírtelo. Lo pueden

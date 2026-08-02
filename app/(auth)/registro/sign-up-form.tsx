@@ -40,7 +40,7 @@ export function SignUpForm({ code }: { code: string }) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="input"
-            placeholder="Emiliano Erginos"
+            placeholder="Nombre y apellido"
           />
         </div>
         <p className="hint mt-1">Como te van a ver los demás. Podés poner nombre y apellido.</p>
@@ -125,7 +125,7 @@ export function SignUpForm({ code }: { code: string }) {
           name="payAlias"
           maxLength={120}
           className="input"
-          placeholder="tu.alias.mp, CBU, o link de Mercado Pago"
+          placeholder="Alias, CBU, IBAN o link de pago"
         />
         <p className="hint mt-1">
           Se lo mostramos sólo a quien te tenga que pagar. Lo podés cargar después desde tu perfil.

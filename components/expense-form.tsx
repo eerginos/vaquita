@@ -202,7 +202,7 @@ export function ExpenseForm({
             maxLength={120}
             defaultValue={initial?.description}
             className="input"
-            placeholder="Asado del sábado"
+            placeholder="Cena del viernes"
           />
         </div>
 

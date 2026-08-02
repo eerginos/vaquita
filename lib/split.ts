@@ -14,7 +14,7 @@ export const SPLIT_TYPES: { id: SplitType; label: string; hint: string }[] = [
     label: "Porcentajes",
     hint: "Escribí el porcentaje de uno y el resto se reparte solo entre los demás. Tiene que sumar 100%.",
   },
-  { id: "SHARES", label: "Partes", hint: "Por ejemplo 2 partes para una pareja y 1 para cada soltero." },
+  { id: "SHARES", label: "Partes", hint: "Por ejemplo 2 partes para quien viene en pareja y 1 para quien viene solo." },
 ];
 
 export type Share = { userId: string; amountCents: bigint; weight: number | null };

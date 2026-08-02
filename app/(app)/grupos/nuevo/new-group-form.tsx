@@ -36,7 +36,7 @@ export function NewGroupForm({ people }: { people: Person[] }) {
             required
             autoFocus
             className="input"
-            placeholder="Depto Palermo, Bariloche 2026…"
+            placeholder="Depto compartido, viaje, cumpleaños…"
           />
         </div>
         <input type="hidden" name="emoji" value={emoji} />

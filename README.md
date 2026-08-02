@@ -36,7 +36,7 @@ Registro cerrado por invitación, sin apps de terceros, sin límites de free tie
 
 - **Grupos** con moneda propia, ícono y archivado.
 - **Gastos** con cuatro formas de dividir: partes iguales, montos exactos,
-  porcentajes y partes (ej. 2 partes para una pareja, 1 para cada soltero).
+  porcentajes y partes (ej. 2 partes para quien viene en pareja).
 - **Varios pagadores** en un mismo gasto.
 - **Balances** por grupo y consolidados por persona.
 - **Simplificación de deudas** opcional por grupo: en vez de A→B y B→C,
