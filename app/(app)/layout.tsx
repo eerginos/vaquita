@@ -15,10 +15,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <div className="relative mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4">
           {/* La vaca arranca en el borde de arriba y cuelga por debajo de la
               barra. El nombre va corrido a la derecha para dejarle el lugar. */}
-          <Link href="/" className="flex items-center" title="Vaquita">
+          <Link href="/" className="flex items-center" title="Ir al inicio" aria-label="Ir al inicio">
             <VaquitaCabeza
               size={84}
-              className="pointer-events-none absolute left-2 top-[3px] z-20 drop-shadow-[0_5px_9px_rgba(0,0,0,.35)] sm:left-3"
+              className="absolute left-2 top-[3px] z-20 drop-shadow-[0_5px_9px_rgba(0,0,0,.35)] sm:left-3"
             />
             <span className="ml-[74px] sm:ml-[86px]">
               <VaquitaTexto height={24} className="sm:hidden" />

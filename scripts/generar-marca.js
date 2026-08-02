@@ -20,6 +20,8 @@ const trim = (f) => sharp(`brand/${f}`).trim({ threshold: 1 });
   // La vista previa de los links se genera con un renderer que no lee WebP.
   await trim("cabeza.png").resize({ width: 300 }).png({ compressionLevel: 9, palette: true, quality: 88 })
     .toFile("public/marca/cabeza-og.png");
+  await trim("texto.png").resize({ width: 480 }).png({ compressionLevel: 9, palette: true, quality: 88 })
+    .toFile("public/marca/texto-og.png");
 
   // Iconos: sobre el verde de la marca, porque iOS rellena de negro lo transparente.
   const cara = await trim("cabeza.png").resize({ width: 800 }).png().toBuffer();

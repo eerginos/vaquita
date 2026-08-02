@@ -41,9 +41,12 @@ export default async function Image({ params }: { params: Promise<{ code: string
 
   // El renderer no puede pedirle archivos al servidor: la imagen se lee del
   // disco y se le pasa embebida.
-  const vaca = await readFile(join(process.cwd(), "public", "marca", "cabeza-og.png"))
-    .then((b) => `data:image/png;base64,${b.toString("base64")}`)
-    .catch(() => null);
+  const leer = (archivo: string) =>
+    readFile(join(process.cwd(), "public", "marca", archivo))
+      .then((b) => `data:image/png;base64,${b.toString("base64")}`)
+      .catch(() => null);
+
+  const [vaca, texto] = await Promise.all([leer("cabeza-og.png"), leer("texto-og.png")]);
 
   // El dominio sale de la configuración: cada instalación muestra el suyo.
   const host = (() => {
@@ -73,9 +76,14 @@ export default async function Image({ params }: { params: Promise<{ code: string
             // eslint-disable-next-line @next/next/no-img-element
             <img src={vaca} width={130} height={129} alt="" />
           ) : null}
-          <div style={{ display: "flex", fontSize: "48px", color: "#ffffff", fontWeight: 700 }}>
-            Vaquita
-          </div>
+          {texto ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={texto} width={240} height={78} alt="" />
+          ) : (
+            <div style={{ display: "flex", fontSize: "48px", color: "#ffffff", fontWeight: 700 }}>
+              Vaquita
+            </div>
+          )}
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
