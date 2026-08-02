@@ -84,7 +84,7 @@ reverse proxy adelante (Caddy, nginx, Traefik) para el dominio y el certificado.
    `PostgreSQL 17`. Anotá la connection string interna.
 
 2. **Aplicación**: `+ New` → `Public/Private Repository` →
-   `github.com/eerginos/erginos-split`.
+   `github.com/eerginos/vaquita`.
    - Build Pack: **Dockerfile**
    - Port: **3000**
    - Health check path: `/api/salud`

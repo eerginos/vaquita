@@ -79,8 +79,6 @@ No están descartadas para siempre; se dejaron afuera con una razón.
   (nombre y email). Es necesario para poder invitar, pero es data que se comparte entre todos los
   que usan la app.
 - **Sin backups automáticos de la base.** Hoy depende de lo que haga Coolify por su lado.
-- **El repo se llama `erginos-split` y la app se llama Vaquita.** Se renombró la app pero no el
-  repositorio, para no tocar la conexión que Coolify ya tiene con GitHub.
 
 ## Historia
 
@@ -89,4 +87,4 @@ Coolify → responsive y zona horaria → recálculo retroactivo → autocomplet
 con emoji → ideas tomadas de Splittr (alias, saldar de un click, estadísticas) → marca propia →
 invitaciones para varios con vista previa en WhatsApp.
 
-El repo es privado: `github.com/eerginos/erginos-split`.
+El repo es privado: `github.com/eerginos/vaquita`.
