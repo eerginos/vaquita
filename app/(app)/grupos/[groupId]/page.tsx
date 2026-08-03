@@ -38,6 +38,11 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
   const myBalance = group.net.get(user.id) ?? 0n;
   const myCosts = totals.costsByUser.get(user.id) ?? 0n;
 
+  // Un grupo recién creado no tiene saldos, ni deudas, ni nada que saldar.
+  // Mostrar esos bloques en cero sólo repite tres veces que está vacío.
+  const reciénCreado = timeline.length === 0;
+  const estoySolo = group.members.length === 1;
+
   // En las listas apretadas va el nombre de pila; el completo queda para
   // integrantes, perfil y el detalle del gasto.
   const short = shortNames(group.members);
@@ -103,6 +108,7 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
             consumido mucho y estar en cero porque pagaste justo tu parte. */}
         {/* En el teléfono van como lista, etiqueta a la izquierda y número a
             la derecha: en columnas, un importe largo desarma la grilla. */}
+        {!reciénCreado && (
         <dl className="mt-4 space-y-2 border-t pt-4 sm:grid sm:grid-cols-3 sm:gap-3 sm:space-y-0">
           <div className="flex items-baseline justify-between gap-3 sm:block">
             <dt className="text-xs text-[var(--text-muted)]">
@@ -131,9 +137,12 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
             </dd>
           </div>
         </dl>
+        )}
 
-        <div className="mt-4 flex flex-wrap items-center justify-end gap-3 border-t pt-4">
-          {!group.archivedAt && (
+        {/* Con el grupo vacío las acciones las lleva el estado de abajo, que
+            además explica qué conviene hacer primero. Repetirlas acá sobra. */}
+        {!reciénCreado && !group.archivedAt && (
+          <div className="mt-4 flex flex-wrap items-center justify-end gap-3 border-t pt-4">
             <div className="flex w-full gap-2 sm:w-auto">
               <Link
                 href={`/grupos/${groupId}/saldar`}
@@ -148,10 +157,11 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
                 + Agregar gasto
               </Link>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </header>
 
+{!reciénCreado && (
       <section className="card">
         <div className="flex items-center justify-between border-b px-5 py-3">
           <h2 className="text-sm font-semibold text-[var(--text-muted)]">
@@ -235,6 +245,7 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
           </ul>
         </details>
       </section>
+)}
 
       <section>
         <h2 className="mb-3 text-lg font-semibold tracking-tight">Movimientos</h2>
@@ -242,14 +253,28 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
         {timeline.length === 0 ? (
           <div className="card">
             <EmptyState
-              icon="🧾"
-              title="Todavía no hay gastos"
-              description="Cargá el primero y empezamos a llevar la cuenta."
+              icon={estoySolo ? "👋" : "🧾"}
+              title={estoySolo ? "Todavía estás solo acá" : "Todavía no hay gastos"}
+              description={
+                estoySolo
+                  ? "Sumá a los demás y después cargá el primer gasto. También podés cargarlo ahora: cuando lleguen, los sumás a lo que ya esté."
+                  : "Cargá el primero y empezamos a llevar la cuenta."
+              }
               action={
                 !group.archivedAt ? (
-                  <Link href={`/grupos/${groupId}/gastos/nuevo`} className="btn-primary">
-                    Agregar gasto
-                  </Link>
+                  <div className="flex w-full max-w-xs flex-col gap-2 sm:w-auto sm:max-w-none sm:flex-row">
+                    {estoySolo && (
+                      <Link href={`/grupos/${groupId}/configuracion`} className="btn-primary">
+                        Sumar gente
+                      </Link>
+                    )}
+                    <Link
+                      href={`/grupos/${groupId}/gastos/nuevo`}
+                      className={estoySolo ? "btn-secondary" : "btn-primary"}
+                    >
+                      Agregar gasto
+                    </Link>
+                  </div>
                 ) : undefined
               }
             />
