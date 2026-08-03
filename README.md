@@ -16,7 +16,23 @@
 
 ---
 
-Registro cerrado por invitación, sin apps de terceros, sin límites de free tier.
+## Por qué existe
+
+Armás el grupo para el viaje, empezás a cargar gastos, y cuando por fin se suman
+los que faltaban resulta que sólo cuentan desde ahí en adelante: todo lo anterior
+quedó dividido entre los que estaban. Para arreglarlo hay que editar gasto por
+gasto a mano, o dejar las cuentas mal.
+
+Vaquita nació de esa bronca. Podés recalcular los gastos ya cargados para incluir
+a quien llegó tarde, viendo cómo quedan los saldos antes y después de aplicarlo.
+
+Lo demás sale de autoalojarlo: sin publicidad, sin cuenta premium, sin límite de
+gastos por mes, y con quién le debe cuánto a quién guardado en tu servidor y no
+en el de otro. El registro es cerrado, por invitación.
+
+**Los importes se guardan como enteros en centavos y se reparten por el método del
+resto mayor**, así la suma de las partes da siempre exactamente el total del gasto.
+No se pierde ni se inventa un centavo.
 
 <p align="center">
   <img src="docs/captura-resumen.png" alt="Pantalla de resumen: saldo total, grupos y con quién estás en deuda" width="820">
@@ -28,9 +44,8 @@ Registro cerrado por invitación, sin apps de terceros, sin límites de free tie
   <sub>Adentro de un grupo: quién le debe a quién, ya simplificado, y el botón para saldar de un click.</sub>
 </p>
 
-> Este archivo es cómo levantarlo y desplegarlo.
-> [`CONTEXT.md`](CONTEXT.md) explica por qué las cosas son como son y qué se decidió no hacer.
-> [`AGENTS.md`](AGENTS.md) es la guía para trabajar en el código.
+> [`CONTEXT.md`](CONTEXT.md) explica por qué las cosas son como son y qué se decidió
+> no hacer. [`AGENTS.md`](AGENTS.md) es la guía para trabajar en el código.
 
 ## Qué hace
 
@@ -57,12 +72,6 @@ Registro cerrado por invitación, sin apps de terceros, sin límites de free tie
 | Estilos | Tailwind CSS 4 |
 | Auth | Sesiones propias en cookie httpOnly + bcrypt |
 | Deploy | Docker (multi-stage) → Coolify |
-
-### Cómo se maneja la plata
-
-Todos los importes se guardan como **enteros en centavos** (`BigInt`), nunca
-como float. El reparto usa el método del resto mayor, así la suma de las partes
-da siempre exactamente el total del gasto — no se pierde ni se inventa un centavo.
 
 ## Desarrollo local
 

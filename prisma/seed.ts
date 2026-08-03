@@ -24,10 +24,10 @@ const PEOPLE = [
     name: "Emiliano",
     email: process.env.BOOTSTRAP_ADMIN_EMAIL || "emi@ejemplo.com",
     isAdmin: true,
-    payAlias: "emiliano.vaquita.mp",
+    payAlias: "emiliano.pagos",
   },
-  { name: "Sofía Ruiz", email: "sofia@ejemplo.com", isAdmin: false, payAlias: "sofiaruiz.mp" },
-  { name: "Martín Paz", email: "martin@ejemplo.com", isAdmin: false, payAlias: "0000003100010000000001" },
+  { name: "Sofía Ruiz", email: "sofia@ejemplo.com", isAdmin: false, payAlias: "sofia.ruiz" },
+  { name: "Martín Paz", email: "martin@ejemplo.com", isAdmin: false, payAlias: "1234 5678 9012 3456 7890" },
   { name: "Lucía Fernández", email: "lucia@ejemplo.com", isAdmin: false, payAlias: "luchi.fernandez" },
   { name: "Nico Álvarez", email: "nico@ejemplo.com", isAdmin: false, payAlias: null },
 ];
@@ -78,9 +78,9 @@ async function main() {
   // ------------------------------------------------------------- grupo depto
   const depto = await prisma.group.create({
     data: {
-      name: "Depto Palermo",
+      name: "Depto compartido",
       emoji: "🏠",
-      currency: "ARS",
+      currency: "EUR",
       simplifyDebts: true,
       createdById: emi.id,
       members: {
@@ -93,12 +93,12 @@ async function main() {
     },
   });
 
-  // -------------------------------------------------------- grupo Bariloche
+  // ----------------------------------------------------------- grupo viaje
   const viaje = await prisma.group.create({
     data: {
-      name: "Bariloche 2026",
+      name: "Viaje a la montaña",
       emoji: "🏔️",
-      currency: "ARS",
+      currency: "EUR",
       simplifyDebts: true,
       createdById: sofia.id,
       members: {
@@ -112,12 +112,12 @@ async function main() {
     },
   });
 
-  // ---------------------------------------------------------- grupo asados
-  const asados = await prisma.group.create({
+  // -------------------------------------------------------- grupo juntadas
+  const juntadas = await prisma.group.create({
     data: {
-      name: "Los asados",
+      name: "Las juntadas",
       emoji: "🍻",
-      currency: "ARS",
+      currency: "EUR",
       simplifyDebts: false,
       createdById: martin.id,
       members: {
@@ -144,33 +144,33 @@ async function main() {
     notes?: string;
   };
 
-  const groupIds: Record<string, string> = { depto: depto.id, viaje: viaje.id, asados: asados.id };
-  const currencyOf: Record<string, string> = { depto: "ARS", viaje: "ARS", asados: "ARS" };
+  const groupIds: Record<string, string> = { depto: depto.id, viaje: viaje.id, juntadas: juntadas.id };
+  const currencyOf: Record<string, string> = { depto: "EUR", viaje: "EUR", juntadas: "EUR" };
 
   const seeds: Seed[] = [
     // Depto
-    { group: "depto", description: "Alquiler de agosto", amount: 890_000, category: "alquiler", daysAgo: 28, payer: emi.id, among: [emi.id, sofia.id, martin.id] },
-    { group: "depto", description: "Expensas", amount: 145_500, category: "servicios", daysAgo: 27, payer: sofia.id, among: [emi.id, sofia.id, martin.id] },
-    { group: "depto", description: "Internet Fibertel", amount: 38_900, category: "servicios", daysAgo: 24, payer: martin.id, among: [emi.id, sofia.id, martin.id] },
-    { group: "depto", description: "Súper de la semana", amount: 96_340, category: "super", daysAgo: 18, payer: sofia.id, among: [emi.id, sofia.id, martin.id] },
-    { group: "depto", description: "Luz y gas", amount: 62_180, category: "servicios", daysAgo: 12, payer: emi.id, among: [emi.id, sofia.id, martin.id] },
-    { group: "depto", description: "Cosas de limpieza", amount: 27_450, category: "compras", daysAgo: 6, payer: martin.id, among: [emi.id, sofia.id, martin.id] },
-    { group: "depto", description: "Súper de la semana", amount: 88_200, category: "super", daysAgo: 3, payer: emi.id, among: [emi.id, sofia.id, martin.id] },
+    { group: "depto", description: "Alquiler del mes", amount: 1_200, category: "alquiler", daysAgo: 28, payer: emi.id, among: [emi.id, sofia.id, martin.id] },
+    { group: "depto", description: "Gastos del edificio", amount: 180, category: "servicios", daysAgo: 27, payer: sofia.id, among: [emi.id, sofia.id, martin.id] },
+    { group: "depto", description: "Internet", amount: 45, category: "servicios", daysAgo: 24, payer: martin.id, among: [emi.id, sofia.id, martin.id] },
+    { group: "depto", description: "Súper de la semana", amount: 120, category: "super", daysAgo: 18, payer: sofia.id, among: [emi.id, sofia.id, martin.id] },
+    { group: "depto", description: "Luz y gas", amount: 85, category: "servicios", daysAgo: 12, payer: emi.id, among: [emi.id, sofia.id, martin.id] },
+    { group: "depto", description: "Cosas de limpieza", amount: 32, category: "compras", daysAgo: 6, payer: martin.id, among: [emi.id, sofia.id, martin.id] },
+    { group: "depto", description: "Súper de la semana", amount: 96, category: "super", daysAgo: 3, payer: emi.id, among: [emi.id, sofia.id, martin.id] },
 
-    // Bariloche
-    { group: "viaje", description: "Cabaña 4 noches", amount: 1_240_000, category: "alojamiento", daysAgo: 45, payer: sofia.id, among: [sofia.id, emi.id, lucia.id, nico.id], notes: "Seña pagada en junio, resto al llegar." },
-    { group: "viaje", description: "Pasajes de micro", amount: 520_000, category: "transporte", daysAgo: 44, payer: emi.id, among: [sofia.id, emi.id, lucia.id, nico.id] },
-    { group: "viaje", description: "Alquiler de auto", amount: 310_000, category: "transporte", daysAgo: 40, payer: nico.id, among: [sofia.id, emi.id, lucia.id, nico.id] },
-    { group: "viaje", description: "Súper para la cabaña", amount: 187_600, category: "super", daysAgo: 39, payer: lucia.id, among: [sofia.id, emi.id, lucia.id, nico.id] },
-    { group: "viaje", description: "Cena en El Boliche de Alberto", amount: 164_800, category: "comida", daysAgo: 38, payer: emi.id, among: [sofia.id, emi.id, lucia.id, nico.id] },
-    { group: "viaje", description: "Pases de esquí", amount: 940_000, category: "entretenimiento", daysAgo: 37, payer: sofia.id, among: [sofia.id, emi.id, nico.id], notes: "Lucía no esquió." },
-    { group: "viaje", description: "Nafta", amount: 78_300, category: "transporte", daysAgo: 36, payer: nico.id, among: [sofia.id, emi.id, lucia.id, nico.id] },
+    // Viaje
+    { group: "viaje", description: "Casa 4 noches", amount: 960, category: "alojamiento", daysAgo: 45, payer: sofia.id, among: [sofia.id, emi.id, lucia.id, nico.id], notes: "Seña pagada en junio, resto al llegar." },
+    { group: "viaje", description: "Pasajes de tren", amount: 420, category: "transporte", daysAgo: 44, payer: emi.id, among: [sofia.id, emi.id, lucia.id, nico.id] },
+    { group: "viaje", description: "Alquiler de auto", amount: 260, category: "transporte", daysAgo: 40, payer: nico.id, among: [sofia.id, emi.id, lucia.id, nico.id] },
+    { group: "viaje", description: "Súper para la casa", amount: 145, category: "super", daysAgo: 39, payer: lucia.id, among: [sofia.id, emi.id, lucia.id, nico.id] },
+    { group: "viaje", description: "Cena del sábado", amount: 128, category: "comida", daysAgo: 38, payer: emi.id, among: [sofia.id, emi.id, lucia.id, nico.id] },
+    { group: "viaje", description: "Pases de esquí", amount: 720, category: "entretenimiento", daysAgo: 37, payer: sofia.id, among: [sofia.id, emi.id, nico.id], notes: "Lucía no esquió." },
+    { group: "viaje", description: "Combustible", amount: 62, category: "transporte", daysAgo: 36, payer: nico.id, among: [sofia.id, emi.id, lucia.id, nico.id] },
 
-    // Asados
-    { group: "asados", description: "Carne y achuras", amount: 142_000, category: "comida", daysAgo: 21, payer: martin.id, among: [martin.id, emi.id, nico.id, lucia.id] },
-    { group: "asados", description: "Bebidas y hielo", amount: 58_400, category: "salidas", daysAgo: 21, payer: emi.id, among: [martin.id, emi.id, nico.id, lucia.id] },
-    { group: "asados", description: "Asado de despedida", amount: 196_500, category: "comida", daysAgo: 9, payer: nico.id, among: [martin.id, emi.id, nico.id, lucia.id], splitType: "SHARES", weights: [2, 1, 2, 1], notes: "Martín y Nico vinieron con la familia." },
-    { group: "asados", description: "Postre y café", amount: 34_900, category: "comida", daysAgo: 9, payer: lucia.id, among: [martin.id, emi.id, nico.id, lucia.id] },
+    // Juntadas
+    { group: "juntadas", description: "Compras para la cena", amount: 110, category: "comida", daysAgo: 21, payer: martin.id, among: [martin.id, emi.id, nico.id, lucia.id] },
+    { group: "juntadas", description: "Bebidas y hielo", amount: 45, category: "salidas", daysAgo: 21, payer: emi.id, among: [martin.id, emi.id, nico.id, lucia.id] },
+    { group: "juntadas", description: "Cena de despedida", amount: 152, category: "comida", daysAgo: 9, payer: nico.id, among: [martin.id, emi.id, nico.id, lucia.id], splitType: "SHARES", weights: [2, 1, 2, 1], notes: "Martín y Nico vinieron con la familia." },
+    { group: "juntadas", description: "Postre y café", amount: 27, category: "comida", daysAgo: 9, payer: lucia.id, among: [martin.id, emi.id, nico.id, lucia.id] },
   ];
 
   console.log(`Creando ${seeds.length} gastos…`);
@@ -224,9 +224,9 @@ async function main() {
 
   console.log("Creando pagos…");
   const settlements = [
-    { groupId: depto.id, from: martin.id, to: emi.id, amount: 210_000, daysAgo: 10 },
-    { groupId: viaje.id, from: lucia.id, to: sofia.id, amount: 400_000, daysAgo: 20, note: "Transferencia" },
-    { groupId: viaje.id, from: emi.id, to: sofia.id, amount: 150_000, daysAgo: 5, note: "MercadoPago" },
+    { groupId: depto.id, from: martin.id, to: emi.id, amount: 165, daysAgo: 10 },
+    { groupId: viaje.id, from: lucia.id, to: sofia.id, amount: 310, daysAgo: 20, note: "Transferencia" },
+    { groupId: viaje.id, from: emi.id, to: sofia.id, amount: 120, daysAgo: 5, note: "En efectivo" },
   ];
 
   for (const s of settlements) {
@@ -236,7 +236,7 @@ async function main() {
         fromUserId: s.from,
         toUserId: s.to,
         amountCents: BigInt(s.amount) * 100n,
-        currency: "ARS",
+        currency: "EUR",
         date: daysAgo(s.daysAgo),
         note: s.note ?? null,
         createdById: s.from,
@@ -255,7 +255,7 @@ async function main() {
           fromName: settlement.from.name,
           toName: settlement.to.name,
           amountCents: settlement.amountCents.toString(),
-          currency: "ARS",
+          currency: "EUR",
         },
       },
     });
@@ -263,7 +263,7 @@ async function main() {
 
   console.log("Creando comentarios…");
   const alquiler = await prisma.expense.findFirstOrThrow({
-    where: { groupId: depto.id, description: "Alquiler de agosto" },
+    where: { groupId: depto.id, description: "Alquiler del mes" },
   });
   await prisma.comment.createMany({
     data: [
