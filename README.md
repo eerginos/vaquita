@@ -154,6 +154,22 @@ variables de la tabla del paso 3 salvo `DATABASE_URL` (esa se arma sola) más
    está vacía, esa primera cuenta se crea sin invitación y queda como admin.
    A partir de ahí el registro queda cerrado.
 
+### Redeploy automático en cada push
+
+Como el repo es público no hay integración de GitHub App, así que el disparador
+va por webhook y se configura una sola vez:
+
+1. En Coolify, en la aplicación → pestaña **Webhooks** → fila **GitHub**, dentro
+   de *Manual Git Webhooks*. Copiá la URL y revelá el secret con el ojito.
+   No uses el *Deploy Webhook* de arriba: ese pide un token de API y desde
+   GitHub te va a devolver 401.
+2. El botón *Webhook Configuration on GitHub* te lleva derecho a la pantalla del
+   repo. Pegá la URL y el secret, poné content type `application/json` y dejá
+   sólo el evento `push`.
+
+Para verificar, mirá *Recent Deliveries* en el webhook de GitHub: tilde verde es
+que Coolify contestó. Si da timeout, tu Coolify no es accesible desde internet.
+
 ## Cómo sumar gente
 
 No hay envío de mails (a propósito: una dependencia menos). Todo va por link:
