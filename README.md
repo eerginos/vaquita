@@ -35,7 +35,9 @@ resto mayor**, así la suma de las partes da siempre exactamente el total del ga
 No se pierde ni se inventa un centavo.
 
 <p align="center">
-  <img src="docs/captura-resumen.png" alt="Pantalla de resumen: saldo total, grupos y con quién estás en deuda" width="820">
+  <img src="docs/demo.gif" alt="Recorrido por Vaquita: cargar un gasto, registrar un pago y sumar a alguien a los gastos anteriores" width="880">
+  <br>
+  <sub>Cargar un gasto, registrar un pago, y sumar a alguien a los gastos que ya estaban cargados.</sub>
 </p>
 
 <p align="center">
