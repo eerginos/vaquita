@@ -54,39 +54,44 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
   return (
     <div className="space-y-6">
       <header className="card p-5">
-        <div className="flex flex-wrap items-start gap-4">
-          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[var(--surface-2)] text-2xl">
-            {group.emoji}
-          </span>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
+          <div className="flex min-w-0 flex-1 items-start gap-4">
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[var(--surface-2)] text-2xl">
+              {group.emoji}
+            </span>
 
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-xl font-semibold tracking-tight">{group.name}</h1>
-              {group.archivedAt && (
-                <span className="chip border-transparent bg-[var(--surface-2)] text-[var(--text-muted)]">
-                  archivado
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-xl font-semibold tracking-tight">{group.name}</h1>
+                {group.archivedAt && (
+                  <span className="chip border-transparent bg-[var(--surface-2)] text-[var(--text-muted)]">
+                    archivado
+                  </span>
+                )}
+              </div>
+              <div className="mt-1.5 flex items-center gap-2">
+                <AvatarStack people={group.members} max={6} />
+                <span className="text-xs text-[var(--text-muted)]">
+                  {group.members.length} {group.members.length === 1 ? "persona" : "personas"} ·{" "}
+                  {group.currency}
                 </span>
-              )}
-            </div>
-            <div className="mt-1.5 flex items-center gap-2">
-              <AvatarStack people={group.members} max={6} />
-              <span className="text-xs text-[var(--text-muted)]">
-                {group.members.length} personas · {group.currency}
-              </span>
+              </div>
             </div>
           </div>
 
-          <div className="flex gap-1">
+          {/* En el teléfono estos dos van en su propia fila. Si comparten la
+              del nombre lo aprietan hasta partirlo en dos renglones. */}
+          <div className="flex w-full gap-2 sm:w-auto sm:shrink-0 sm:gap-1">
             <Link
               href={`/grupos/${groupId}/estadisticas`}
-              className="btn-ghost px-2 py-1.5 text-xs"
+              className="btn-secondary flex-1 text-center text-sm sm:flex-none"
               title="Estadísticas del grupo"
             >
               📊 Números
             </Link>
             <Link
               href={`/grupos/${groupId}/configuracion`}
-              className="btn-ghost px-2 py-1.5 text-xs"
+              className="btn-secondary flex-1 text-center text-sm sm:flex-none"
               title="Configuración del grupo"
             >
               ⚙️ Ajustes
@@ -96,12 +101,14 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
 
         {/* El saldo y lo que gastaste son cosas distintas: podés haber
             consumido mucho y estar en cero porque pagaste justo tu parte. */}
-        <dl className="mt-4 grid grid-cols-2 gap-3 border-t pt-4 sm:grid-cols-3">
-          <div>
+        {/* En el teléfono van como lista, etiqueta a la izquierda y número a
+            la derecha: en columnas, un importe largo desarma la grilla. */}
+        <dl className="mt-4 space-y-2 border-t pt-4 sm:grid sm:grid-cols-3 sm:gap-3 sm:space-y-0">
+          <div className="flex items-baseline justify-between gap-3 sm:block">
             <dt className="text-xs text-[var(--text-muted)]">
               {myBalance === 0n ? "Tu saldo" : myBalance > 0n ? "Te deben" : "Debés"}
             </dt>
-            <dd className="mt-0.5">
+            <dd className="sm:mt-0.5">
               {myBalance === 0n ? (
                 <span className="text-sm text-[var(--text-muted)]">estás al día 🎉</span>
               ) : (
@@ -110,16 +117,16 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
             </dd>
           </div>
 
-          <div>
+          <div className="flex items-baseline justify-between gap-3 sm:block">
             <dt className="text-xs text-[var(--text-muted)]">Consumiste vos</dt>
-            <dd className="mt-0.5 text-lg font-semibold tabular-nums">
+            <dd className="text-lg font-semibold tabular-nums sm:mt-0.5">
               {formatMoney(myCosts, group.currency)}
             </dd>
           </div>
 
-          <div className="col-span-2 sm:col-span-1">
+          <div className="flex items-baseline justify-between gap-3 sm:block">
             <dt className="text-xs text-[var(--text-muted)]">Gastó el grupo</dt>
-            <dd className="mt-0.5 text-lg font-semibold tabular-nums text-[var(--text-muted)]">
+            <dd className="text-lg font-semibold tabular-nums text-[var(--text-muted)] sm:mt-0.5">
               {formatMoney(totals.totalCents, group.currency)}
             </dd>
           </div>
@@ -127,11 +134,17 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
 
         <div className="mt-4 flex flex-wrap items-center justify-end gap-3 border-t pt-4">
           {!group.archivedAt && (
-            <div className="flex gap-2">
-              <Link href={`/grupos/${groupId}/saldar`} className="btn-secondary text-sm">
+            <div className="flex w-full gap-2 sm:w-auto">
+              <Link
+                href={`/grupos/${groupId}/saldar`}
+                className="btn-secondary flex-1 text-center text-sm sm:flex-none"
+              >
                 Saldar cuentas
               </Link>
-              <Link href={`/grupos/${groupId}/gastos/nuevo`} className="btn-primary text-sm">
+              <Link
+                href={`/grupos/${groupId}/gastos/nuevo`}
+                className="btn-primary flex-1 text-center text-sm sm:flex-none"
+              >
                 + Agregar gasto
               </Link>
             </div>
