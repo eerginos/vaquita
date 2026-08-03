@@ -112,6 +112,9 @@ docker compose up -d
 Levanta la app y su base. Las migraciones se aplican solas al arrancar. Poné un
 reverse proxy adelante (Caddy, nginx, Traefik) para el dominio y el certificado.
 
+Cuando esté arriba, entrá a tu dominio y creá tu cuenta: ver
+[Tu primera cuenta](#tu-primera-cuenta).
+
 ## Deploy en Coolify
 
 Hay dos caminos. El de abajo crea la base como recurso propio de Coolify, que
@@ -147,12 +150,9 @@ variables de la tabla del paso 3 salvo `DATABASE_URL` (esa se arma sola) más
 4. **Dominio**: poné el tuyo, el mismo que `APP_URL`. Coolify saca el
    certificado con Let's Encrypt solo.
 
-5. Deploy. El contenedor corre `prisma migrate deploy` al arrancar, así que
-   las tablas se crean solas.
-
-6. Entrá a `/registro` con el email de `BOOTSTRAP_ADMIN_EMAIL`: como la base
-   está vacía, esa primera cuenta se crea sin invitación y queda como admin.
-   A partir de ahí el registro queda cerrado.
+5. Deploy. El contenedor corre `prisma migrate deploy` al arrancar, así que las
+   tablas se crean solas. Cuando termine, creá tu cuenta: ver
+   [Tu primera cuenta](#tu-primera-cuenta).
 
 ### Redeploy automático en cada push
 
@@ -169,6 +169,19 @@ va por webhook y se configura una sola vez:
 
 Para verificar, mirá *Recent Deliveries* en el webhook de GitHub: tilde verde es
 que Coolify contestó. Si da timeout, tu Coolify no es accesible desde internet.
+
+## Tu primera cuenta
+
+Entrá a tu dominio. Como todavía no hay nadie, la pantalla de ingreso te ofrece
+**Creá la primera** — no hace falta que te acuerdes de ninguna ruta. Registrate
+con el mismo email que pusiste en `BOOTSTRAP_ADMIN_EMAIL`.
+
+Esa cuenta se crea sin invitación y queda como administradora. Es la única que
+puede hacerlo: apenas existe, el link desaparece y el registro queda cerrado.
+De ahí en adelante se entra sólo por invitación.
+
+Después conviene pasar por `/admin` y elegir la zona horaria, que es de lo que
+depende que un gasto cargado de noche quede con la fecha correcta.
 
 ## Cómo sumar gente
 
