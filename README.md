@@ -181,6 +181,8 @@ No hay envío de mails (a propósito: una dependencia menos). Todo va por link:
   si cambia, todas las sesiones y los links de reset dejan de valer.
 - Todas las Server Actions revalidan la membresía al grupo antes de tocar nada.
 
+Si encontrás un agujero, no abras un issue: está todo en [`SECURITY.md`](SECURITY.md).
+
 ## Qué quedó afuera (por ahora)
 
 Multi-moneda con conversión, recibos adjuntos, gastos recurrentes y
